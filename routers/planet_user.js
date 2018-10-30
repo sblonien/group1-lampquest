@@ -1,12 +1,12 @@
-var express = require("express");
-var router  = express.Router();
+let express = require("express");
+let router  = express.Router();
 
-var User = require('../model/user.js');
-var PlanetUser = require('../model/planet_user.js');
+let User = require('../model/user.js');
+let PlanetUser = require('../model/planet_user.js');
 
 // Sends active planet_user parameters over HTTP GET 
 router.get('/planet_user/parameters',function(req,res){
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     //Check if session is valid and get user_id
     user.getParameters(function(err_user, user_response) {
         if (err_user) {
@@ -14,7 +14,7 @@ router.get('/planet_user/parameters',function(req,res){
             res.send(err_user);
         }
         else {
-            var planet_user = new PlanetUser(user_response.user_id);
+            let planet_user = new PlanetUser(user_response.user_id);
             planet_user.getParameters(function(err_planet_user, planet_user_response) {
                 if (err_planet_user) {
                     res.status(500);
@@ -29,7 +29,7 @@ router.get('/planet_user/parameters',function(req,res){
 
 // Send currently available energy in the planet 
 router.get('/planet_user/getEnergy',function(req,res){
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     
     //Check if session is valid and get user_id
     user.getParameters(function(err_user, user_response) {
@@ -39,8 +39,8 @@ router.get('/planet_user/getEnergy',function(req,res){
             res.send(err_user);
         }
         else {
-            var planet_user = new PlanetUser(user_response.user_id);
-            planet_user.getAvaliableEnergy(function(err_planet_user, energy) {
+            let planet_user = new PlanetUser(user_response.user_id);
+            planet_user.getAvailableEnergy(function(err_planet_user, energy) {
                 if (err_planet_user) {
                     res.status(500);
                     res.send(err_planet_user);
@@ -55,7 +55,7 @@ router.get('/planet_user/getEnergy',function(req,res){
 
 // Send the required items in the planet 
 router.get('/planet_user/goals', function(req, res) {
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     
     user.getParameters(function(err_user, user_response) {
         if (err_user) {
@@ -63,7 +63,7 @@ router.get('/planet_user/goals', function(req, res) {
             res.send(err_user);
         }
         else {
-            var planet_user = new PlanetUser(user_response.user_id);
+            let planet_user = new PlanetUser(user_response.user_id);
             planet_user.getGoals(function(err_planet_user, planet_user_response) {
                 if (err_planet_user) {
                     res.status(500);
@@ -78,7 +78,7 @@ router.get('/planet_user/goals', function(req, res) {
 
 // Send the items that are owned by the user in the planet
 router.get('/planet_user/owned', function(req, res) {
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     
     user.getParameters(function(err_user, user_response) {
         if (err_user) {
@@ -86,7 +86,7 @@ router.get('/planet_user/owned', function(req, res) {
             res.send(err_user);
         }
         else {
-            var planet_user = new PlanetUser(user_response.user_id);
+            let planet_user = new PlanetUser(user_response.user_id);
             planet_user.getOwnedItems(function(err_planet_user, planet_user_response) {
                 if (err_planet_user) {
                     res.status(500);
@@ -101,7 +101,7 @@ router.get('/planet_user/owned', function(req, res) {
 
 // Handle production catch-up and periodic updates 
 router.get('/planet_user/update_production', function(req, res) {
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     
     user.getParameters(function(err_user, user_response) {
 
@@ -110,7 +110,7 @@ router.get('/planet_user/update_production', function(req, res) {
             res.send(err_user);
         }
         else {
-            var planet_user = new PlanetUser(user_response.user_id);
+            let planet_user = new PlanetUser(user_response.user_id);
             planet_user.updateProduction(true, function(err, result) {
                 if (err) {
                     res.status(500);
@@ -125,7 +125,7 @@ router.get('/planet_user/update_production', function(req, res) {
 
 // Send boolean response if the planet quest is completed or not
 router.get('/planet_user/check_if_completed', function(req, res) {
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     
     user.getParameters(function(err_user, user_response) {
 		
@@ -135,7 +135,7 @@ router.get('/planet_user/check_if_completed', function(req, res) {
         }
             
         
-        var planet_user = new PlanetUser(user_response.user_id);
+        let planet_user = new PlanetUser(user_response.user_id);
         planet_user.checkIfCompleted(function(err, result, all_completed) {
             if (err) {
                 res.status(500);
@@ -157,7 +157,7 @@ router.get('/planet_user/check_if_completed', function(req, res) {
 
 // Reset the planet to original state.
 router.get('/planet_user/reset', function(req,res) {
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     
     user.getParameters(function(err_user, user_response) {
         if (err_user) {
@@ -165,7 +165,7 @@ router.get('/planet_user/reset', function(req,res) {
             res.send(err_user);
         }
         
-        var planet_user = new PlanetUser(user_response.user_id);
+        let planet_user = new PlanetUser(user_response.user_id);
         planet_user.resetPlanet(function(err, result) {
             if (err) {
                 res.status(500);

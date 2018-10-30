@@ -1,4 +1,4 @@
-var mainApp = angular.module("mainApp", ['ngRoute']);
+let mainApp = angular.module("mainApp", ['ngRoute']);
 mainApp.config(['$routeProvider', function($routeProvider) {
    $routeProvider.
    when('/', {
@@ -37,7 +37,7 @@ mainApp.controller('planetParameters',function($scope, $http, $interval) {
             $scope.difficulty_level = res.data.difficulty_level;
      });
      
-    var updateEnergy = function() {
+    let updateEnergy = function() {
         $http.get('/planet_user/getEnergy').then(function(res) {
             $scope.energy = res.data.energy;
         });
@@ -58,7 +58,7 @@ mainApp.controller('robotTypes', function($scope, $http) {
         $scope.combiners = [];
         $scope.diffusors = [];
         
-        for(var i=0; i<res.data.length; i++) {
+        for(let i=0; i<res.data.length; i++) {
             if(res.data[i].type == "combiner") $scope.combiners.push(res.data[i]);
             if(res.data[i].type == "diffusor") $scope.diffusors.push(res.data[i]);
         }
@@ -67,7 +67,7 @@ mainApp.controller('robotTypes', function($scope, $http) {
 });
 
 mainApp.controller('ownedItems', function($scope, $http, $interval) {
-    var updateOwnedItems = function() {
+    let updateOwnedItems = function() {
         $http.get('/planet_user/update_production').then(function(result) {
             $http.get('/planet_user/owned').then(function(res) {
                 $scope.owned = res.data;
@@ -95,7 +95,7 @@ mainApp.controller('ownedRobots', function($scope, $http, $window) {
 });
 
 mainApp.controller('complete', function($http, $interval, $window) {
-    var check = function() {
+    let check = function() {
         $http.get('/planet_user/check_if_completed').then(function(res) {
             if(res.data.completed) { //If planet quest is completed, show the modal saying level is completed. 
                 $('#modal_level_complete').modal('show');

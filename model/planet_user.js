@@ -1,6 +1,6 @@
-var pool = require('../scripts/db_connection.js').connection_pool; // For database connection
+let pool = require('../scripts/db_connection.js').connection_pool; // For database connection
 
-var Robot = require('../model/robot.js');
+let Robot = require('../model/robot.js');
 
 class PlanetUser {
     constructor(user_id, planet_id) {
@@ -10,9 +10,9 @@ class PlanetUser {
     
     // Adds new planet to the user with given difficulty.
     addNewPlanet(difficulty, callback) {
-        var self = this;
-        
-        var sql = "INSERT INTO planet_user (planet_id, user_id, energy) \
+        let self = this;
+
+        let sql = "INSERT INTO planet_user (planet_id, user_id, energy) \
                         SELECT planet_id, ?, initial_energy \
                         FROM planet \
                         WHERE difficulty_level = ? \
@@ -34,13 +34,13 @@ class PlanetUser {
                 } 
                 
                 // If there are no new planets available, return false
-                if(result.affectedRows == 0) {
+                if(result.affectedRows === 0) {
                     callback(null, false);
                     con.release();
                 }
                 else {
                     //Add initial resources for the new planet to the user
-                    var sql_1 = "INSERT INTO planet_user_item (planet_user_id, item_id, owned_qty) \
+                    let sql_1 = "INSERT INTO planet_user_item (planet_user_id, item_id, owned_qty) \
                                     SELECT planet_user_id, item_id, available_qty \
                                     FROM planet_item_init_resource NATURAL JOIN planet_user \
                                     WHERE planet_user_id = ?";
@@ -66,11 +66,11 @@ class PlanetUser {
     
     // Return the callback function with planet user parameters 
     getParameters(callback) {
-        var self = this;
+        let self = this;
         
         // If both planet id and user id are available, extract data for the particular planet and user
         if(self.user_id && self.planet_id) {
-            var sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
+            let sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
                         FROM planet_user NATURAL JOIN planet \
                         WHERE user_id = ? AND planet_id = ?";
             pool.getConnection(function(con_err, con) {
@@ -96,7 +96,7 @@ class PlanetUser {
         }
         // If only user id is available, the extract data for the active planet (i.e. completed = 0)
         else if(self.user_id) {
-            var sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
+            let sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
                         FROM planet_user NATURAL JOIN planet \
                         WHERE user_id = ? AND completed = 0";   
             pool.getConnection(function(con_err, con) {
@@ -115,10 +115,10 @@ class PlanetUser {
                         return;
                     }
                     
-                    if(result.length == 0) {
+                    if(result.length === 0) {
                         // No active planet found. 
                         // Check if there is new planet is available 
-                        var check_new = "SELECT MIN(difficulty_level) AS difficulty \
+                        let check_new = "SELECT MIN(difficulty_level) AS difficulty \
                                         FROM planet \
                                         WHERE planet_id NOT IN ( \
                                                 SELECT planet_id \
@@ -134,7 +134,7 @@ class PlanetUser {
                                 return;
                             }
                             
-                            if(result_new.length == 0) {
+                            if(result_new.length === 0) {
                                 // No new planet found
                                 callback(null, null);
                             }
@@ -178,11 +178,11 @@ class PlanetUser {
     }
     
     // Returns the callback function with available energy in the active planet.
-    getAvaliableEnergy(callback) {
-        var self = this;
+    getAvailableEnergy(callback) {
+        let self = this;
         
         if(self.user_id) {
-            var sql = "SELECT energy \
+            let sql = "SELECT energy \
                         FROM planet_user NATURAL JOIN planet \
                         WHERE user_id = ? AND completed = 0";     
             pool.getConnection(function(con_err, con) {
@@ -199,7 +199,7 @@ class PlanetUser {
                         con.release();
                         return;
                     }
-                    if(result.length == 0) 
+                    if(result.length === 0) 
                         callback(null, null);
                     else 
                         callback(null, result[0].energy);
@@ -212,10 +212,10 @@ class PlanetUser {
     
     // Returns the required goals for the current planet
     getGoals(callback) {
-        var self = this;
+        let self = this;
         
         if(self.user_id) {
-            var sql = "SELECT item_name, item_image, required_qty \
+            let sql = "SELECT item_name, item_image, required_qty \
                         FROM planet_item_goal NATURAL JOIN planet_user NATURAL JOIN item \
                         WHERE user_id = ? AND completed = 0";
             pool.getConnection(function(con_err, con) {
@@ -244,11 +244,11 @@ class PlanetUser {
     
     // Returns the owned item with their quantities in the active planet 
     getOwnedItems(callback) {
-        var self = this;
+        let self = this;
         
         if(self.user_id) {
             // planet_user_item may contain multiple entires for same item, so the owned quantity is aggregated 
-            var sql = "SELECT item_id, MAX(item_name) item_name, MAX(item_image) item_image, SUM(owned_qty) owned_qty \
+            let sql = "SELECT item_id, MAX(item_name) item_name, MAX(item_image) item_image, SUM(owned_qty) owned_qty \
                         FROM planet_user_item NATURAL JOIN planet_user NATURAL JOIN item \
                         WHERE user_id = ? AND completed = 0\
                         GROUP BY item_id \
@@ -279,10 +279,10 @@ class PlanetUser {
     
     // Returns the list of enabled robot ids in the planet 
     getEnabledRobots(callback) {
-        var self = this;
+        let self = this;
         
         if(self.user_id) {
-            var sql = "SELECT DISTINCT robot_id \
+            let sql = "SELECT DISTINCT robot_id \
                         FROM robot NATURAL JOIN planet_user NATURAL LEFT JOIN ( \
                             SELECT * \
                             FROM item_robot \
@@ -318,19 +318,19 @@ class PlanetUser {
     // Performs both periodic updated and catch-up updates in the planet
     updateProduction(first_call, callback) {  
         // first_call variable is used so that in multiple calls of this method during the recursion, only one final callback is issued.
-        var self = this;
+        let self = this;
         
         self.catchup_required = false; //Flag to check if catchup is required
         
         // Produce a single robot
-        var produce = function(robot_id, callback) {
-            var robot = new Robot(robot_id);
+        let produce = function(robot_id, callback) {
+            let robot = new Robot(robot_id);
             robot.startProduction(callback);
         };
         
         // Produce from multiple robots sequentially
-        var produce_multiple = function(robot_ids, process) {
-            var i = 0;
+        let produce_multiple = function(robot_ids, process) {
+            let i = 0;
             
             function next() {
                 if(i < robot_ids.length) {
@@ -368,9 +368,9 @@ class PlanetUser {
     
     // Check if the goals of the planet is reached.
     checkIfCompleted(callback) {
-        var self = this;
-        
-        var sql = "SELECT COALESCE(owned_qty,0) owned_qty, required_qty \
+        let self = this;
+
+        let sql = "SELECT COALESCE(owned_qty,0) owned_qty, required_qty \
                     FROM ( \
                         SELECT user_id, item_id, SUM(owned_qty) owned_qty \
                         FROM planet_user_item NATURAL JOIN planet_user \
@@ -422,11 +422,11 @@ class PlanetUser {
                             con.release();
                             return;
                         }
-                        
-                        var difficulty = result_params.difficulty_level;
+
+                        let difficulty = result_params.difficulty_level;
                         
                         // If completed, update current planet `completed` field.
-                        var update = "UPDATE planet_user \
+                        let update = "UPDATE planet_user \
                                         SET completed = 1 \
                                         WHERE user_id = ? AND completed = 0";
                                         
@@ -452,7 +452,7 @@ class PlanetUser {
                                 if(result_new) {
                                     
                                     // Add experience point to user
-                                    var exp_pts = "UPDATE user SET experience = experience + ? WHERE user_id = ?";
+                                    let exp_pts = "UPDATE user SET experience = experience + ? WHERE user_id = ?";
                                     con.query(exp_pts, [difficulty, self.user_id], function(err_exp) {
                                         if (err_exp) {
                                             console.log('Error encountered on ' + Date());
@@ -491,34 +491,34 @@ class PlanetUser {
     }
     
     resetPlanet(callback) {
-        var self = this;
+        let self = this;
         
         // Delete all log records for the planet 
-        var del_log = "DELETE FROM item_robot \
+        let del_log = "DELETE FROM item_robot \
                         WHERE robot_id IN ( \
                             SELECT robot_id FROM robot NATURAL JOIN planet_user WHERE user_id = ? AND completed = 0 \
                         )";
-                        
-        var del_robots = "DELETE FROM robot \
+
+        let del_robots = "DELETE FROM robot \
                             WHERE planet_user_id = ( \
                                 SELECT planet_user_id \
                                 FROM planet_user \
                                 WHERE user_id = ? AND completed = 0 \
                             )";
         
-        var del_owned_items = "DELETE FROM planet_user_item \
+        let del_owned_items = "DELETE FROM planet_user_item \
                                WHERE planet_user_id = ( \
                                 SELECT planet_user_id \
                                 FROM planet_user \
                                 WHERE user_id = ? AND completed = 0 \
                               )";
                               
-        var insert_init_items = "INSERT INTO planet_user_item (planet_user_id, item_id, owned_qty) \
+        let insert_init_items = "INSERT INTO planet_user_item (planet_user_id, item_id, owned_qty) \
                                 SELECT planet_user_id, item_id, available_qty \
                                 FROM planet_item_init_resource NATURAL JOIN planet_user \
                                 WHERE user_id = ? AND completed = 0";
         
-        var update_energy = "UPDATE planet_user pu \
+        let update_energy = "UPDATE planet_user pu \
                                 INNER JOIN  planet p ON  p.planet_id = pu.planet_id \
                              SET pu.energy = p.initial_energy \
                              WHERE pu.user_id = ? AND completed = 0";

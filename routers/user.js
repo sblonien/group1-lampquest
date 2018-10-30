@@ -1,8 +1,8 @@
-var express = require("express");
-var router  = express.Router();
+let express = require("express");
+let router  = express.Router();
 
 
-var User = require('../model/user.js');
+let User = require('../model/user.js');
 
 router.post('/user/login',function(req,res){
     if(req.body.inputUsername && req.body.inputPassword) {
@@ -19,7 +19,7 @@ router.post('/user/login',function(req,res){
         res.redirect('/');
     }
     else {
-        var user = new User(req.session.uname, req.session.pword);
+        let user = new User(req.session.uname, req.session.pword);
         user.isValid(function(err, result) {
             if(err) {
                 res.status(500);
@@ -43,7 +43,7 @@ router.post('/user/valid', function(req, res) {
         res.send('new');
     }
     else {
-        var user = new User(req.session.uname, req.session.pword);
+        let user = new User(req.session.uname, req.session.pword);
          user.isValid(function(err, result) {
             if(err) {
                 res.status(500);
@@ -62,8 +62,8 @@ router.post('/user/valid', function(req, res) {
 
 //Check if username is available
 router.get('/user/uname/available', function(req, res) {
-    var username = req.query['username'];
-    var user = new User(username, '');
+    let username = req.query['username'];
+    let user = new User(username, '');
     
     user.isUsernameAvailable(function(err, available) {
         if(err) {
@@ -77,8 +77,8 @@ router.get('/user/uname/available', function(req, res) {
 
 //Add new user
 router.post('/user/addnew', function(req,res) {
-    var username = req.body.inputUsername;
-    var password = req.body.inputPassword;
+    let username = req.body.inputUsername;
+    let password = req.body.inputPassword;
     
     req.session.uname = username;
     req.session.pword = password;
@@ -88,7 +88,7 @@ router.post('/user/addnew', function(req,res) {
         res.redirect('/');
     }
     
-    var user = new User(username, password);
+    let user = new User(username, password);
     user.isUsernameAvailable(function(err, available) {
         if(err) {
             res.status(500);
@@ -122,7 +122,7 @@ router.get('/user/signout', function(req,res) {
 });
 
 router.get('/user/parameters', function(req, res) {
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     user.getParameters(function(err, response) {
         if(err) {
             res.status(500);

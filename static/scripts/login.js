@@ -1,4 +1,4 @@
-var loginApp = angular.module("loginApp", ['ngRoute']);
+let loginApp = angular.module("loginApp", ['ngRoute']);
 loginApp.config(['$routeProvider', function($routeProvider) {
    $routeProvider.
    when('/', {
@@ -48,7 +48,7 @@ loginApp.directive('usernameAvailable', ['$http', function($http) {
 
 loginApp.controller('signupControl',function($scope) {
     $scope.encryptPassword = function () {
-        var shaObj = new jsSHA("SHA-512", "TEXT");
+        let shaObj = new jsSHA("SHA-512", "TEXT");
         shaObj.update($scope.inputPassword);
         
         $scope.inputPassword = shaObj.getHash("HEX");
@@ -58,7 +58,7 @@ loginApp.controller('signupControl',function($scope) {
 
 loginApp.controller('loginControl', function($scope, $http) {
     $scope.encryptPassword = function () {
-        var shaObj = new jsSHA("SHA-512", "TEXT");
+        let shaObj = new jsSHA("SHA-512", "TEXT");
         shaObj.update($scope.inputPassword);  
 
         $scope.inputPassword = shaObj.getHash("HEX");
