@@ -1,4 +1,4 @@
-var pool = require('../scripts/db_connection.js').connection_pool; // For database connection
+let pool = require('../scripts/db_connection.js').connection_pool; // For database connection
 
 class RobotType {
     constructor (robot_type_id) {
@@ -7,9 +7,9 @@ class RobotType {
     
     //Returns if the robot_type is a combiner or diffusor 
     getType(callback) {
-        var self = this;
+        let self = this;
         
-        var sql = "SELECT \
+        let sql = "SELECT \
                           combiner_id IS NOT NULL AS is_combiner, \
                           diffusor_id IS NOT NULL AS is_diffusor \
                     FROM robot_type \
@@ -67,9 +67,9 @@ class RobotType {
     }
     **/
     getParameters(callback) {
-        var self = this;
+        let self = this;
         
-        var type_id = self.robot_type_id;
+        let type_id = self.robot_type_id;
         
         self.getType(function(err, type) {
             if(err) {
@@ -77,7 +77,7 @@ class RobotType {
                 return;
             }
             if(type == "combiner") {
-                var sql = "SELECT \
+                let sql = "SELECT \
                                 robot_type_id, \
                                 robot_type_name, \
                                 robot_type_image, \
@@ -111,7 +111,7 @@ class RobotType {
                             return;
                         } 
                         
-                        var result = {};
+                        let result = {};
                         result.robot_type_id = records[0].robot_type_id;
                         result.robot_type = records[0].robot_type_name;
                         result.image      = records[0].robot_type_image;
@@ -140,7 +140,7 @@ class RobotType {
                 });                    
             }
             else {
-                var sql = "SELECT \
+                let sql = "SELECT \
                                 robot_type_id, \
                                 robot_type_name, \
                                 robot_type_image, \
@@ -176,7 +176,7 @@ class RobotType {
                             return;
                         } 
                         
-                        var result = {};
+                        let result = {};
                         result.robot_type_id = records[0].robot_type_id;
                         result.robot_type   = records[0].robot_type_name;
                         result.image        = records[0].robot_type_image;
@@ -213,7 +213,7 @@ class RobotType {
     
     // Fetch all robot type ids in the database. 
     fetchAllRobotTypeIds(callback){
-        var sql = "SELECT robot_type_id FROM robot_type";
+        let sql = "SELECT robot_type_id FROM robot_type";
         pool.getConnection(function(con_err, con) {
             if(con_err) {
                 console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -230,7 +230,7 @@ class RobotType {
                     return;
                 } 
                 
-                var ids = [];
+                let ids = [];
                 result.forEach(function(item) {
                     ids.push(item.robot_type_id);
                     if(ids.length == result.length) callback(null, ids);

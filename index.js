@@ -1,13 +1,13 @@
-var express = require("express");
-var app     = express();
-var path    = require("path"); //Required for sending files 
+let express = require("express");
+let app     = express();
+let path    = require("path"); //Required for sending files
 
 // Requierd for establishing user session
-var session = require('express-session');
+let session = require('express-session');
 app.use(session({secret:'$#cr#t'}));
 
 // Required for using cookies
-var cookieParser = require('cookie-parser');
+let cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 // Used for evaluating post requests
@@ -26,7 +26,7 @@ app.use(require('./routers/planet_user.js'));
 app.use(require('./routers/robot_types.js'));
 
 // Import the model User
-var User = require('./model/user.js');
+let User = require('./model/user.js');
 
 // Defines action for the root of the application (Eg. http://localhost:3000/)
 app.get('/',function(req,res){
@@ -42,7 +42,7 @@ app.get('/',function(req,res){
   }
   else {
     //If session is set, check if the user session is valid or not.
-    var user = new User(req.session.uname, req.session.pword);
+    let user = new User(req.session.uname, req.session.pword);
     user.isValid(function(err, response) {
         if(err) throw err;
             

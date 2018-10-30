@@ -1,6 +1,6 @@
-var mysql = require('mysql');
-var credentials = require('../../credentials/config');
+let mysql = require('mysql');
+let credentials = require('../../credentials/config');
 
-var pool = mysql.createPool(credentials.prod);
+let pool = mysql.createPool(credentials.prod);
 
 module.exports = { connection_pool: pool };
