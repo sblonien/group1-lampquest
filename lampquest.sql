@@ -233,7 +233,7 @@ CREATE TABLE `planet_user` (
   `planet_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `energy` int(11) NOT NULL,
-  `completed` tinyint(1) NOT NULL,
+  `completed` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`planet_user_id`),
   UNIQUE KEY `planet_id` (`planet_id`,`user_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
@@ -364,7 +364,7 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `experience` int(11) NOT NULL,
+  `experience` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;

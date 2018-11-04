@@ -12,8 +12,8 @@ class PlanetUser {
     addNewPlanet(difficulty, callback) {
         let self = this;
 
-        let sql = "INSERT INTO planet_user (planet_id, user_id, energy) \
-                        SELECT planet_id, ?, initial_energy \
+        let sql = "INSERT INTO planet_user (planet_id, user_id, energy, completed) \
+                        SELECT planet_id, ?, initial_energy, 0 \
                         FROM planet \
                         WHERE difficulty_level = ? \
                         LIMIT 1";
@@ -286,11 +286,11 @@ class PlanetUser {
                         FROM robot NATURAL JOIN planet_user NATURAL LEFT JOIN ( \
                             SELECT * \
                             FROM item_robot \
-                            WHERE build_end_time IS NULL \
+                            WHERE build_end_time IS NULL\
+                             ORDER BY build_start_time \
                         ) AS ir \
                         WHERE user_id = ? AND completed = 0 \
-                            AND enabled = 1 \
-                        ORDER BY build_start_time";
+                            AND enabled = 1 ";
             pool.getConnection(function(con_err, con) {
                 if(con_err) {
                     console.log("Error - " + Date() + "\nUnable to connect to database.");
