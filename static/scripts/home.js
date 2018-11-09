@@ -7,6 +7,9 @@ mainApp.config(['$routeProvider', function($routeProvider) {
    when('/factory', {
       templateUrl: 'view/factory.html'
    }).
+   when('/planets', {
+      templateUrl: 'view/planet-picker.html'
+   }).
    otherwise({
       redirectTo: '/'
    });
@@ -50,6 +53,12 @@ mainApp.controller('planetParameters',function($scope, $http, $interval) {
         $scope.goals = res.data;
    });
    
+});
+
+mainApp.controller('leaderboard', function($scope, $http) {
+   $http.get('/planet_user/leaderboard').then(function(res){
+       $scope.leaderboard = res;
+   }); 
 });
 
 mainApp.controller('robotTypes', function($scope, $http) {

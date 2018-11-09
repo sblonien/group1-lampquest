@@ -179,4 +179,19 @@ router.get('/planet_user/reset', function(req,res) {
     });
 });
 
+router.get('/planet_user/leaderboard', function(req, res) {
+    let leaderboard = new Leaderboard();
+    
+    leaderboard.getScores(function(err, result){
+        if(err) {
+            res.status(500);
+            res.send(err);
+        }
+        
+        if(result){
+            res.send(result);
+        }
+    });
+});
+
 module.exports = router
