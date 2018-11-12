@@ -76,10 +76,11 @@ loginApp.controller('loginControl', function($scope, $http) {
     });
 });
 
-loginApp.directive('leaderboard', function() {
-    return {
-        template : "Leaderboard"
-    };
+loginApp.controller('leaderboard', function($scope, $http) {
+    $http.get('/planet_user/leaderboard').then(function(res) {
+        console.log(JSON.stringify(res.data));
+        $scope.leaderboardData = res.data;
+    });
 });
         
         

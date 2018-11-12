@@ -1,12 +1,22 @@
 let pool = require('../scripts/db_connection.js').connection_pool; //for db connection
 
 class Leaderboard {
+    constructor() {
+
+    }
+
     getScores(callback) {
-        let sql = "SELECT username, (3 * SUM(completed) + experience) AS score \
+        let sql ="SELECT RANK() OVER (ORDER BY score DESC) place, username, score \
+                    FROM (SELECT username, (3 * SUM(completed) + experience) AS score \
                     FROM user NATURAL JOIN planet_user \
                     GROUP BY user_id \
                     ORDER BY score DESC \
-                    LIMIT 5;";
+                    LIMIT 5) r;";
+        // let sql = "SELECT username, (3 * SUM(completed) + experience) AS score \
+        //             FROM user NATURAL JOIN planet_user \
+        //             GROUP BY user_id \
+        //             ORDER BY score DESC \
+        //             LIMIT 5;";
         pool.getConnection(function(con_err, con) {
             if(con_err) {
                 console.log("Error - " + Date() + "\nUnable to connect to database.");

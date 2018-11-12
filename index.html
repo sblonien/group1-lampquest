@@ -27,8 +27,8 @@
                     </p>
                 </div>
                 <!-- Leaderboard -->
-                <div class="card pr-4">
-                    <h3 leaderboard class="m-3"></h3>
+                <div class="card pr-4 bg-light" ng-controller="leaderboard">
+                    <h3 class="m-3">Leaderboard</h3>
                     <table class="table table-hover m-3"
                            ng-init="names=[{name: 'John', place: 1, points: 735},
                                             {name: 'Tom', place: 2, points: 721},
@@ -43,10 +43,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="person in names">
+                            <tr ng-repeat="person in leaderboardData">
                                 <th scope="row">{{person.place}}</th>
-                                <td>{{person.name}}</td>
-                                <td>{{person.points}}</td>
+                                <td>{{person.username}}</td>
+                                <td>{{person.score}}</td>
                             </tr>
                         </tbody>
                     </table>

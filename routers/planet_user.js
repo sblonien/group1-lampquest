@@ -3,6 +3,7 @@ let router  = express.Router();
 
 let User = require('../model/user.js');
 let PlanetUser = require('../model/planet_user.js');
+let Leaderboard = require('../model/leaderboard.js');
 
 // Sends active planet_user parameters over HTTP GET 
 router.get('/planet_user/parameters',function(req,res){
