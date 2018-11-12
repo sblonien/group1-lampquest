@@ -6,17 +6,18 @@ class Leaderboard {
     }
 
     getScores(callback) {
-        let sql ="SELECT RANK() OVER (ORDER BY score DESC) place, username, score \
-                    FROM (SELECT username, (3 * SUM(completed) + experience) AS score \
-                    FROM user NATURAL JOIN planet_user \
-                    GROUP BY user_id \
-                    ORDER BY score DESC \
-                    LIMIT 5) r;";
+        let sql = "SELECT @row := @row + 1 AS place, username, score FROM (SELECT username, (3 * SUM(completed) + experience) AS score \
+            FROM user NATURAL JOIN planet_user \
+            GROUP BY user_id \
+            ORDER BY score DESC \
+            LIMIT 5) u, (select @row := 0) r;";
+
         // let sql = "SELECT username, (3 * SUM(completed) + experience) AS score \
         //             FROM user NATURAL JOIN planet_user \
         //             GROUP BY user_id \
         //             ORDER BY score DESC \
         //             LIMIT 5;";
+
         pool.getConnection(function(con_err, con) {
             if(con_err) {
                 console.log("Error - " + Date() + "\nUnable to connect to database.");
