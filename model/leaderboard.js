@@ -6,7 +6,7 @@ class Leaderboard {
                     FROM user NATURAL JOIN planet_user \
                     GROUP BY user_id \
                     ORDER BY score DESC \
-                    LIMIT 5;"
+                    LIMIT 5;";
         pool.getConnection(function(con_err, con) {
             if(con_err) {
                 console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -30,3 +30,5 @@ class Leaderboard {
         });
     }
 }
+
+module.exports = Leaderboard;

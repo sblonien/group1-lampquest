@@ -26,6 +26,31 @@
                         <a class="btn btn-primary btn-lg" href="#" role="button" data-toggle="modal" data-target="#game_desc">Learn more</a>
                     </p>
                 </div>
+                <!-- Leaderboard -->
+                <div class="card pr-4">
+                    <h3 leaderboard class="m-3"></h3>
+                    <table class="table table-hover m-3"
+                           ng-init="names=[{name: 'John', place: 1, points: 735},
+                                            {name: 'Tom', place: 2, points: 721},
+                                            {name: 'Danny', place: 3, points: 669},
+                                            {name: 'Bob', place: 4, points: 645},
+                                            {name: 'Jimmy', place: 5, points: 631}]">
+                        <thead>
+                            <tr>
+                                <th scope="col">Place</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="person in names">
+                                <th scope="row">{{person.place}}</th>
+                                <td>{{person.name}}</td>
+                                <td>{{person.points}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- Side content with login/signup form-->
             <div class="col-sm-4 card card-body bg-light" ng-view>

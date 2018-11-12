@@ -5,7 +5,10 @@ loginApp.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'view/login-form.html'
    }).
    when('/signup', {
-      templateUrl: 'view/signup-form.html'
+       templateUrl: 'view/signup-form.html'
+   }).
+   when('/leaderboard', {
+       templateUrl: 'view/leaderboard.html'
    }).
    otherwise({
       redirectTo: '/'
@@ -45,12 +48,11 @@ loginApp.directive('usernameAvailable', ['$http', function($http) {
     } 
 }]);
 
-
 loginApp.controller('signupControl',function($scope) {
     $scope.encryptPassword = function () {
         let shaObj = new jsSHA("SHA-512", "TEXT");
         shaObj.update($scope.inputPassword);
-        
+
         $scope.inputPassword = shaObj.getHash("HEX");
         $scope.inputConfirmPassword = shaObj.getHash("HEX");
     }
@@ -62,7 +64,7 @@ loginApp.controller('loginControl', function($scope, $http) {
         shaObj.update($scope.inputPassword);  
 
         $scope.inputPassword = shaObj.getHash("HEX");
-    }
+    };
     
     $http.post('/user/valid').then(function(res) {
         if(res.data=="new") {
@@ -72,6 +74,12 @@ loginApp.controller('loginControl', function($scope, $http) {
             $scope.invalid = true;
         }
     });
+});
+
+loginApp.directive('leaderboard', function() {
+    return {
+        template : "Leaderboard"
+    };
 });
         
         

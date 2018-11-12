@@ -1,5 +1,5 @@
 let express = require("express");
-let router  = express.Router();
+let router  = express();
 
 let User = require('../model/user.js');
 let RobotType = require('../model/robot_type.js');
