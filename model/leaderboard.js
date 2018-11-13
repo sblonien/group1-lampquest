@@ -34,7 +34,6 @@ class Leaderboard {
                     return;
                 }
                 
-                console.log(result);
                 callback(null, result);
                 con.release();
             });

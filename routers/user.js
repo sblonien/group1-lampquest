@@ -137,5 +137,18 @@ router.get('/user/parameters', function(req, res) {
     });
 });
 
+router.get('/user/leaderboard_friend', function(req, res) {
+   let user = new User(req.session.uname, req.session.pword);
+   user.getFriendsLeaderboard(function(err, response) {
+       if(err) {
+            res.status(500);
+            res.send(err);
+       } else if(response) {
+            res.send(response);
+       } else {
+           res.send({name:"Invalid User Session", message:"Username or Password in the session is invalid"});
+       }
+   });
+});
 
 module.exports = router;
