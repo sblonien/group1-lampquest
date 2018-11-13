@@ -75,6 +75,33 @@
                         </table>
                     </div>
                 </div>
+                <div class="card border-secondary mb-3 text-center" ng-controller="friendLeaderboard">
+                    <div class="card-header">
+                        <b>Friends</b>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover m-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="person in leaderboardData">
+                                    <th scope="row">{{person.username}}</th>
+                                    <td>{{person.score}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div>
+                            <button class="btn btn-primary" click="showGlobalLeaderboard">Show Global Leaderboard</button>
+                            <p> </p>
+                            <button class="btn btn-primary" click="showFriendLeaderboard">Show Friend Leaderboard</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

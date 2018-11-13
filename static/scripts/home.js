@@ -118,3 +118,21 @@ mainApp.controller('complete', function($http, $interval, $window) {
     check();
     $interval(check, 1000); //Periodically check every second if the planet quest is completed.
 });
+
+mainApp.controller('friendLeaderboard', function($scope, $http) {
+    $http.get('/planet_user/leaderboard').then(function(res) {
+        $scope.leaderboardData = res.data;
+    });
+
+    const showFriendLeaderboard = function() {
+        $http.get('/user/leaderboard_friend').then(function(res){
+            $scope.leaderboardData = res;
+        });
+    };
+
+    const showGlobalLeaderboard = function() {
+        $http.get('/planet_user/leaderboard').then(function(res) {
+            $scope.leaderboardData = res.data;
+        });
+    }
+});
