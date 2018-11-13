@@ -2,25 +2,24 @@
   <div class="col-sm-6">
     <div class="card border-dark w-45">
         <div class="card-header">
-            <b>Easy Planets</b>
+            <b>Planets</b>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="row in combiners">
+            <li class="list-group-item" ng-repeat="row in planets">
                 <div class="card  border-dark">
                     <div class="row no-gutters">
                         <div class="align-self-center">
-                            <img src="img/robot/{{row.image}}" style="max-height: 90px; max-width: 90px;">
+                            <img src="img/planet/{{row.image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
                         <div class="col">
                             <div class="card-block p-1">
-                                <h6 class="card-title">{{row.robot_type}}</h6>
+                                <h6 class="card-title">{{row.planet}}</h6>
                                 <p class="card-text small">
-                                    Produces <i ng-repeat="item in row.produce">{{item.item}}</i> every {{row.time_req}} sec.<br/>
-                                    Requires <i ng-repeat="item in row.consume">{{item.item}} ({{item.qty}}), </i><br/>
-                                    Energy Cost per Production: <i class="fas fa-burn"></i> -{{row.energy}}  <br/>
-                                    Initial Cost: <i class="fas fa-burn"></i> -{{row.cost}}  
+                                    Goal: <i ng-repeat="planet_item_goal in row.item">{{planet_item_goal.item}}</i> ({{row.required_qty}})<br/>
+                                    Energy available: <i class="fas fa-burn"></i> -{{row.energy}}  <br/>
+                                    Initial energy: <i class="fas fa-burn"></i> -{{row.energy}}  
                                 </p>
-                                <a href="robot_type/addRobot?robot_type_id={{row.robot_type_id}}" class="btn btn-primary btn-sm">Get this!</a>
+                                <a href="planet/addPlanet?planet_id={{row.planet_id}}" class="btn btn-primary btn-sm">Go!</a>
                             </div>
                         </div>
                     </div>

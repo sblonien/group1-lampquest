@@ -75,6 +75,12 @@ mainApp.controller('robotTypes', function($scope, $http) {
     });
 });
 
+mainApp.controller('planets', function($scope, $http) {
+    $http.get('/planet/fetch_all').then(function(res) {
+        $scope.planets = res;
+    });
+});
+
 mainApp.controller('ownedItems', function($scope, $http, $interval) {
     let updateOwnedItems = function() {
         $http.get('/planet_user/update_production').then(function(result) {
