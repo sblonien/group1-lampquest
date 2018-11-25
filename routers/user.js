@@ -75,6 +75,12 @@ router.get('/user/uname/available', function(req, res) {
     });
 });
 
+router.get('/user/is_self', function(req,res) {
+    let username = req.query['friend'];
+    
+    res.send(username == req.session.uname);
+});
+
 router.get('/user/is_friend', function(req,res) {
     let username = req.session.uname;
     let password = req.session.pword;
@@ -88,7 +94,6 @@ router.get('/user/is_friend', function(req,res) {
         }
         else
         {
-            console.error('Sending back: ' + JSON.stringify(result));
             res.send(result);
         }
         

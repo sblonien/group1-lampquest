@@ -110,12 +110,13 @@
                             <div class="form-group">
                                 <label for="addFriend" class="sr-only">Username</label>
                                 <div class="center-container">
-                                    <input type="text" name="inputFriend" ng-model="inputFriend" class="form-control" style="width: 50%;" placeholder="Username" minlength="3" maxlength="255" required not-friend username-exists autofocus>
+                                    <input type="text" name="inputFriend" ng-model="inputFriend" class="form-control" style="width: 50%;" placeholder="Username" minlength="3" maxlength="255" required not-friend not-self username-exists autofocus>
                                 </div>
                                 <div class="text-danger" ng-show = "addFriend.inputFriend.$dirty && addFriend.inputFriend.$invalid">
                                     <span ng-show = "addFriend.inputFriend.$error.notFriend">That user is already a friend.</span>
                                     <span ng-show = "addFriend.inputFriend.$error.required">A username is required.</span>
                                     <span ng-show = "addFriend.inputFriend.$error.usernameExists">That username does not exist.</span>
+                                    <span ng-show = "addFriend.inputFriend.$error.notSelf">You are not allowed to friend yourself.</span>
                                 </div>
                             </div>
                             <div class="form-group">

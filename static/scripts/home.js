@@ -188,8 +188,22 @@ mainApp.directive('notFriend', ['$http', function($http) {
         link: function(scope, element, attributes, model) { 
             model.$asyncValidators.isFriend = function(uname) { 
                 return $http.get('/user/is_friend', {params: { friend: uname}}).then(function (res) {
-                    console.error('Setting notFriend: ' + (res.data != null && res.data.length > 0).toString())
                     model.$setValidity('notFriend', !(res.data != null && res.data.length > 0));
+                }); 
+            };
+        }
+    } 
+}]);
+
+//Custom Validator to check if that user is trying to add himself
+mainApp.directive('notSelf', ['$http', function($http) {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attributes, model) { 
+            model.$asyncValidators.isSelf = function(uname) { 
+                return $http.get('/user/is_self', {params: { friend: uname}}).then(function (res) {
+                    console.error('Is Self? ' + JSON.stringify(res.data))
+                    model.$setValidity('notSelf', !(res.data));
                 }); 
             };
         }
