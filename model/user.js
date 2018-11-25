@@ -221,9 +221,7 @@ class User {
                     return;
                 } 
                 
-                let isAFriend = (result != null && result.length > 0);
-                
-                callback(err, isAFriend);
+                callback(err, result);
                 con.release();
             });
         });

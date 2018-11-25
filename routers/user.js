@@ -81,15 +81,15 @@ router.get('/user/is_friend', function(req,res) {
     let user = new User(username, password);
     let friend_name = req.query['friend'];
     
-    user.isFriend(friend_name, function(err, is_friend) {
+    user.isFriend(friend_name, function(err, result) {
         if(err) {
             res.status(500);
             res.send(err);
         }
         else
         {
-            //console.log('Sending back: ' + JSON.stringify(is_friend));
-            res.send(is_friend);
+            console.error('Sending back: ' + JSON.stringify(result));
+            res.send(result);
         }
         
     });
@@ -158,7 +158,10 @@ router.get('/user/parameters', function(req, res) {
 });
 
 router.post('/user/add_friend', function(req, res) {
-      let username = req.body.inputFriend;
+      let username = req.body.username;
+      console.error('Body: ' + JSON.stringify(req.body));
+      console.error('Params: ' + JSON.stringify(req.body.params));
+      console.error('Username: ' + JSON.stringify(req.body.username));
     
       let user = new User(req.session.uname, req.session.pword);
       user.addFriend(username, function(err, response) {
