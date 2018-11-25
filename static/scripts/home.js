@@ -126,7 +126,7 @@ mainApp.controller('complete', function($http, $interval, $window) {
 });
 
 mainApp.controller('friendLeaderboard', function($scope, $http) {
-    $http.get('/planet_user/leaderboard').then(function(res) {
+    $http.get('/user/friends').then(function(res) {
         $scope.leaderboardData = res.data;
     });
 
@@ -142,3 +142,48 @@ mainApp.controller('friendLeaderboard', function($scope, $http) {
         });
     }
 });
+
+mainApp.controller('addFriendControl', function($scope, $http) {
+    $http.post('/user/valid').then(function(res) {
+        if(res.data=="new") {
+            $scope.invalid = true;
+        }
+        else {
+            $scope.invalid = false;
+        }
+    });
+    
+    $scope.addFriendSubmit = () => {
+        if($scope.inputFriend){
+            
+        }
+    }
+});
+
+//Custom Validator to check if that username exists
+mainApp.directive('usernameExists', ['$http', function($http) {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attributes, model) { 
+            model.$asyncValidators.usernameAvailable = function(uname) { 
+                return $http.get('/user/uname/available', {params: { username: uname}}).then(function (res) {
+                    model.$setValidity('usernameExists', !res.data);
+                }); 
+            };
+        }
+    } 
+}]);
+
+//Custom Validator to check if that user already has that friend
+mainApp.directive('isFriend', ['$http', function($http) {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attributes, model) { 
+            model.$asyncValidators.isFriend = function(uname) { 
+                return $http.get('/user/is_friend', {params: { friend: uname}}).then(function (res) {
+                    model.$setValidity('addFriend.inputFriend.$error.isFriend', !res.data);
+                }); 
+            };
+        }
+    } 
+}]);

@@ -3,56 +3,18 @@ let pool = require('../scripts/db_connection.js').connection_pool; // For databa
 let moment = require('moment');
 
 class Planet {
-    // Constructor to set robot_id
+    // Constructor to set planet_id
     constructor(planet_id) {
         this.planet_id = planet_id;
     }
-    
-    // Get robot type (combiner/diffusor)
-    getItem(callback) {
-        let self = this;
-        
-        let sql = "SELECT planet_type_id FROM planet WHERE robot_id = ?";
-        pool.getConnection(function(con_err, con) {
-            if(con_err) {
-                console.log("Error - " + Date() + "\nUnable to connect to database.");
-                callback(con_err);
-                return;
-            }
-            
-            con.query(sql, [self.robot_id], function (err, result) {
-                if (err) {
-                    console.log('Error encountered on ' + Date());
-                    console.log(err);
-                    callback(err);
-                    con.release();
-                    return;
-                }
-                
-                let robot_type = new RobotType(result[0].robot_type_id);
-                
-                robot_type.getType(function(err_type, type) {
-                    if(err_type) {
-                        callback(err_type);
-                        con.release();
-                        return;
-                    }
-                        
-                    callback(null, type);
-                    con.release();
-                });
-            });
 
-        });
-    }
-
-    // Get robot parameters with the type parameters
+    // Get planet parameters with the type parameters
     getParameters(callback) {
         let self = this;
         
-        let sql = "SELECT planet_id, robot_name, robot_type_id, enabled \
-                    FROM robot \
-                    WHERE robot_id = ?";
+        let sql = "SELECT planet_id, planet_name, enabled \
+                    FROM planet \
+                    WHERE planet_id = ?";
         pool.getConnection(function(con_err, con) {
             if(con_err) {
                 console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -60,7 +22,7 @@ class Planet {
                 return;
             }
             
-            con.query(sql, [self.robot_id], function (err, result) {
+            con.query(sql, [self.planet_id], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
                     console.log(err);
@@ -68,30 +30,14 @@ class Planet {
                     con.release();
                     return;
                 }
-                
-                let robot_type = new RobotType(result[0].robot_type_id);
-                //Fetch robot type parameters
-                robot_type.getParameters(function (err_type, type_params){
-                    if (err_type) {
-                        console.log('Error encountered on ' + Date());
-                        console.log(err_type);
-                        callback(err_type);
-                        con.release();
-                        return;
-                    }
-                    
-                    result[0].type = type_params;
-                    callback(null, result[0]);
-                    con.release();
-                });
             });
         });
     }
     
-    // Fetch all robot_ids that the user own. 
-    fetchAllRobotIds(user_id, callback) {
-        let sql = "SELECT robot_id \
-                    FROM robot \
+    // Fetch all planet_ids of planets the user has started. 
+    fetchAllPlanetIds(user_id, callback) {
+        let sql = "SELECT planet_id \
+                    FROM planet \
                           NATURAL JOIN planet_user  \
                     WHERE user_id = ? AND completed = 0";
         pool.getConnection(function(con_err, con) {
@@ -704,4 +650,4 @@ class Planet {
     }
 }
 
-module.exports = Robot;
+module.exports = Planet;

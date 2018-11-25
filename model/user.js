@@ -170,7 +170,95 @@ class User {
         });
     };
     
+    addFriend(username, callback) {
+        let self = this;
+        let sql = "INSERT INTO friends VALUES \
+        ((SELECT user_id FROM user WHERE username = ? AND password = ?), \
+        (SELECT user_id FROM user WHERE username = ?));";
+        
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            con.query(sql, [self.username, md5(self.password), username], function (err, result) {
+                if (err) {
+                    console.log('Error encountered on ' + Date());
+                    console.log(err);
+                    callback(err);
+                    con.release();
+                    return;
+                } 
+                
+                callback(err, result);
+                con.release();
+            });
+        });
+    }
+    
+    isFriend(friend, callback) {
+        let self = this;
+        let sql = "SELECT 1 FROM friends WHERE user_id_1 = \
+        (SELECT user_id FROM user WHERE username = ? AND password = ? LIMIT 1)\
+        AND user_id_2 =\
+        (SELECT user_id FROM user WHERE username = ? LIMIT 1)";
+        
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            con.query(sql, [self.username, md5(self.password), friend], function (err, result) {
+                if (err) {
+                    console.log('Error encountered on ' + Date());
+                    console.log(err);
+                    callback(err);
+                    con.release();
+                    return;
+                } 
+                
+                let isAFriend = (result != null && result.length > 0);
+                
+                callback(err, isAFriend);
+                con.release();
+            });
+        });
+    }
+    
+    getFriends(callback) {
+        let self = this;
+        let sql = "SELECT username FROM user JOIN (SELECT user_id_2 FROM friends WHERE user_id_1 = \
+        (SELECT user_id FROM user WHERE username = ? AND password = ? LIMIT 1)) AS friendList \
+        ON user.user_id = friendList.user_id_2;";
+        
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            con.query(sql, [self.username, md5(self.password)], function (err, result) {
+                if (err) {
+                    console.log('Error encountered on ' + Date());
+                    console.log(err);
+                    callback(err);
+                    con.release();
+                    return;
+                } 
+                
+                callback(err, result);
+                con.release();
+            });
+        });
+    }
+    
     getFriendsLeaderboard(callback) {
+        let self = this;
         //TODO change query
         let sql = "SELECT @row := @row + 1 AS place, username, score FROM (SELECT username, (3 * SUM(completed) + experience) AS score \
             FROM user NATURAL JOIN planet_user \
@@ -185,7 +273,7 @@ class User {
                 return;
             }
             
-            con.query(sql, [self.username], function (err, result) {
+            con.query(sql, [self.username, md5(self.password)], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
                     console.log(err);

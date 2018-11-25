@@ -24,6 +24,7 @@ app.use(express.static(__dirname + '/static')); // Set up the static files (such
 app.use(require('./routers/user.js'));
 app.use(require('./routers/planet_user.js'));
 app.use(require('./routers/robot_types.js'));
+app.use(require('./routers/planet.js'));
 
 // Import the model User
 let User = require('./model/user.js');

@@ -75,6 +75,26 @@ router.get('/user/uname/available', function(req, res) {
     });
 });
 
+router.get('/user/is_friend', function(req,res) {
+    let username = req.session.uname;
+    let password = req.session.pword;
+    let user = new User(username, password);
+    let friend_name = req.query['friend'];
+    
+    user.isFriend(friend_name, function(err, is_friend) {
+        if(err) {
+            res.status(500);
+            res.send(err);
+        }
+        else
+        {
+            //console.log('Sending back: ' + JSON.stringify(is_friend));
+            res.send(is_friend);
+        }
+        
+    });
+});
+
 //Add new user
 router.post('/user/addnew', function(req,res) {
     let username = req.body.inputUsername;
@@ -135,6 +155,36 @@ router.get('/user/parameters', function(req, res) {
             res.send({name:"Invalid User Session", message:"Username or Password in the session is invalid"});
         }
     });
+});
+
+router.post('/user/add_friend', function(req, res) {
+      let username = req.body.inputFriend;
+    
+      let user = new User(req.session.uname, req.session.pword);
+      user.addFriend(username, function(err, response) {
+       if(err) {
+            res.status(500);
+            res.send(err);
+       } else if(response) {
+            res.send(response);
+       } else {
+           res.send({name:"Invalid User Session", message:"Username or Password in the session is invalid"});
+       }
+   });
+});
+
+router.get('/user/friends', function(req, res) {
+   let user = new User(req.session.uname, req.session.pword);
+      user.getFriends(function(err, response) {
+       if(err) {
+            res.status(500);
+            res.send(err);
+       } else if(response) {
+            res.send(response);
+       } else {
+           res.send({name:"Invalid User Session", message:"Username or Password in the session is invalid"});
+       }
+   });
 });
 
 router.get('/user/leaderboard_friend', function(req, res) {

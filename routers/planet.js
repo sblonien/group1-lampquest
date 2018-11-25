@@ -1,3 +1,9 @@
+let express = require("express");
+let router  = express.Router();
+
+let User = require('../model/user.js');
+let Planet = require('../model/planet.js');
+
 router.get('/planet/fetchAll', function(req,res) {
     let user = new User(req.session.uname, req.session.pword);
     
@@ -38,3 +44,6 @@ router.get('/planet/fetchAll', function(req,res) {
         }
     });
 });
+
+
+module.exports = router;
