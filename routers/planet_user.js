@@ -195,4 +195,4 @@ router.get('/planet_user/leaderboard', function(req, res) {
     });
 });
 
-module.exports = router
+module.exports = router;

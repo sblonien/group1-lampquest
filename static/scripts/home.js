@@ -75,9 +75,11 @@ mainApp.controller('robotTypes', function($scope, $http) {
     });
 });
 
-mainApp.controller('planets', function($scope, $http) {
+mainApp.controller('planetPickerController', function($scope, $http) {
     $http.get('/planet/fetch_all').then(function(res) {
-        $scope.planets = res;
+        $scope.planetData = {};
+        $scope.planetData.planets = res.data;
+        console.log('Planets: ' + JSON.stringify( $scope.planetData.planets));
     });
 });
 
@@ -155,11 +157,9 @@ mainApp.controller('addFriendControl', function($scope, $http) {
     });
     
     $scope.addFriendSubmit = () => {
-        console.error('Submitting: ' + $scope.inputFriend);
         if($scope.inputFriend){
             $http.post('/user/add_friend', {username: $scope.inputFriend}).then(function(response) {
                  $http.get('/user/friends').then(function(res) {
-                     console.error('Response: ' + JSON.stringify(res.data));
                     $scope.friend.leaderboardData = res.data;
                 });
             });
@@ -202,7 +202,6 @@ mainApp.directive('notSelf', ['$http', function($http) {
         link: function(scope, element, attributes, model) { 
             model.$asyncValidators.isSelf = function(uname) { 
                 return $http.get('/user/is_self', {params: { friend: uname}}).then(function (res) {
-                    console.error('Is Self? ' + JSON.stringify(res.data))
                     model.$setValidity('notSelf', !(res.data));
                 }); 
             };

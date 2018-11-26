@@ -33,7 +33,6 @@ router.get('/robot_type/fetch_all',function(req,res){
     });
 });
 
-
 router.get('/robot_type/addRobot', function(req, res) {
     let user = new User(req.session.uname, req.session.pword);
     

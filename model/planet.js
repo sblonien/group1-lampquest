@@ -12,7 +12,7 @@ class Planet {
     getParameters(callback) {
         let self = this;
         
-        let sql = "SELECT planet_id, planet_name, enabled \
+        let sql = "SELECT planet_id, planet_name, planet_image, difficulty_level \
                     FROM planet \
                     WHERE planet_id = ?";
         pool.getConnection(function(con_err, con) {
@@ -21,7 +21,6 @@ class Planet {
                 callback(con_err);
                 return;
             }
-            
             con.query(sql, [self.planet_id], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -30,15 +29,46 @@ class Planet {
                     con.release();
                     return;
                 }
+                
+                callback(null, result);
             });
         });
     }
     
-    // Fetch all planet_ids of planets the user has started. 
+    // Fetch all planet_ids of planets 
     fetchAllPlanetIds(user_id, callback) {
         let sql = "SELECT planet_id \
-                    FROM planet \
-                          NATURAL JOIN planet_user  \
+                    FROM planet";
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            con.query(sql, [user_id], function (err, result) {
+                if (err) {
+                    console.log('Error encountered on ' + Date());
+                    console.log(err);
+                    callback(err);
+                    con.release();
+                    return;
+                }
+                
+                let ids = [];
+                result.forEach(function(item) {
+                    ids.push(item.planet_id);
+                    if(ids.length == result.length) callback(null, ids);
+                });
+            });
+
+        });            
+    }
+    
+    // Fetch all planet_ids of planets the user has started. 
+    fetchAllUserPlanetIds(user_id, callback) {
+        let sql = "SELECT planet_id \
+                    FROM planet NATURAL JOIN planet_user \
                     WHERE user_id = ? AND completed = 0";
         pool.getConnection(function(con_err, con) {
             if(con_err) {
@@ -58,18 +88,14 @@ class Planet {
                 
                 let ids = [];
                 result.forEach(function(item) {
-                    ids.push(item.robot_id);
+                    ids.push(item.planet_id);
                     if(ids.length == result.length) callback(null, ids);
                 });
             });
-
         });            
     }
     
-    
-    
-    
-    
+    // NOT SURE WE NEED THESE YET
     
     //Check if the available energy is sufficient for creating new robot
     checkEnergyCost(user_id, robot_type_id, callback){
