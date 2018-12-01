@@ -15,7 +15,7 @@ mainApp.config(['$routeProvider', function($routeProvider) {
    });
 }]);
 
-//To set active tab in navigation bar
+// To set active tab in navigation bar
 function HeaderController($scope, $location) 
 { 
     $scope.isActive = function (viewLocation) { 
@@ -23,6 +23,14 @@ function HeaderController($scope, $location)
     };
 }
 
+// window.onbeforeunload = function (e) {
+//     // Cancel the event as stated by the standard.
+//     e.preventDefault();
+//     window.location.href = '/user/signout';
+//     // Chrome requires returnValue to be set.
+//     e.returnValue = '';
+//     return 'Please logout before closing the page';
+// };
 
 mainApp.controller('userParameters',function($scope, $http) {
    $http.get('/user/parameters').then(function(res) {
@@ -31,7 +39,6 @@ mainApp.controller('userParameters',function($scope, $http) {
         $scope.user_id = res.data.user_id;
    });
 });
-
 
 mainApp.controller('planetParameters',function($scope, $http, $interval) {
      $http.get('/planet_user/parameters').then(function(res) {
@@ -75,8 +82,36 @@ mainApp.controller('robotTypes', function($scope, $http) {
     });
 });
 
-mainApp.controller('planetPickerController', function($scope, $http) {
+mainApp.controller('planetPicker', function($scope, $http) {
     $http.get('/planet/fetch_all').then(function(res) {
+        
+        $scope.planetData = {};
+        $scope.planetData.planets = res.data;
+        console.log('Planets: ' + JSON.stringify( $scope.planetData.planets));
+    });
+});
+
+mainApp.controller('easyPlanetsPicker', function($scope, $http) {
+    $http.get('/planet/fetch_easy_planets').then(function(res) {
+        
+        $scope.planetData = {};
+        $scope.planetData.planets = res.data;
+        console.log('Planets: ' + JSON.stringify( $scope.planetData.planets));
+    });
+});
+
+mainApp.controller('intermediatePlanetsPicker', function($scope, $http) {
+    $http.get('/planet/fetch_intermediate_planets').then(function(res) {
+        
+        $scope.planetData = {};
+        $scope.planetData.planets = res.data;
+        console.log('Planets: ' + JSON.stringify( $scope.planetData.planets));
+    });
+});
+
+mainApp.controller('hardPlanetsPicker', function($scope, $http) {
+    $http.get('/planet/fetch_hard_planets').then(function(res) {
+        
         $scope.planetData = {};
         $scope.planetData.planets = res.data;
         console.log('Planets: ' + JSON.stringify( $scope.planetData.planets));
@@ -84,6 +119,10 @@ mainApp.controller('planetPickerController', function($scope, $http) {
 });
 
 mainApp.controller('ownedItems', function($scope, $http, $interval) {
+    //console.error('Parent is: ' + JSON.stringify($scope.$parent));
+    
+    // $scope = $scope.$parent.$scope;
+    
     let updateOwnedItems = function() {
         $http.get('/planet_user/update_production').then(function(result) {
             $http.get('/planet_user/owned').then(function(res) {
@@ -167,6 +206,10 @@ mainApp.controller('addFriendControl', function($scope, $http) {
     }
 });
 
+mainApp.controller('modifyAccount', function($scope, $http, $window) {
+    
+});
+
 //Custom Validator to check if that username exists
 mainApp.directive('usernameExists', ['$http', function($http) {
     return {
@@ -192,7 +235,7 @@ mainApp.directive('notFriend', ['$http', function($http) {
                 }); 
             };
         }
-    } 
+    }; 
 }]);
 
 //Custom Validator to check if that user is trying to add himself
@@ -206,5 +249,26 @@ mainApp.directive('notSelf', ['$http', function($http) {
                 }); 
             };
         }
-    } 
+    };
 }]);
+
+mainApp.controller('nightControl', function($scope, $http, $window) {
+        $scope.mode = 'light';
+        $scope.modeDisplay = 'Dark Mode';
+        $scope.pnlColor = 'color: black;';
+        $scope.bkgClr = '';
+        
+        $scope.switchMode = () => {
+            if($scope.mode == 'light'){
+                $scope.mode = 'dark';
+                $scope.modeDisplay = 'Light Mode';
+                $scope.pnlColor = 'background-color: #566584; color: white;';
+                $scope.bkgClr = 'night';
+            } else {
+                $scope.mode = 'light';
+                $scope.modeDisplay = 'Dark Mode';
+                $scope.pnlColor = 'color: black;';
+                $scope.bkgClr = '';
+            }
+        };
+});

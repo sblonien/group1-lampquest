@@ -26,7 +26,16 @@ router.post('/user/login',function(req,res){
                 res.send(err);
             }
             else if(result) {
-                res.redirect('/home');
+                user.setOnline(1, function(err, result2) {
+                    if(err) {
+                        res.status(500);
+                        res.send(err);
+                    } else if(result2) {
+                        res.redirect('/home');
+                    } else {
+                        res.redirect('/');
+                    }
+                });
             }    
             else {
                 res.redirect('/');
@@ -57,6 +66,25 @@ router.post('/user/valid', function(req, res) {
             }
         });
     }
+});
+
+router.get('/user/delete_account', function(req, res) {
+    let username = req.session.uname;
+    let password = req.session.pword;
+    
+    let user = new User(req.session.uname, req.session.pword);
+    user.deleteUser(function(err, result) {
+        if(err) {
+            res.status(500);
+            res.send(err);
+        }
+        else if(result) {
+            res.redirect('/user/signout');
+        }    
+        else {
+            res.send('invalid');
+        }
+    });
 });
 
 
@@ -139,11 +167,18 @@ router.post('/user/addnew', function(req,res) {
 
 //Sign out
 router.get('/user/signout', function(req,res) {
-    req.session.destroy();
-    res.clearCookie("uname");
-    res.clearCookie("pword");
-    res.redirect('/');
-    
+    let user = new User(req.session.uname, req.session.pword);
+    if(user) user.setOnline(0, function(err, result) {
+        if(err) {
+            res.status(500);
+            res.send(err);
+        } else if(result) {
+            req.session.destroy();
+            res.clearCookie("uname");
+            res.clearCookie("pword");
+            res.redirect('/');
+        }
+    });
 });
 
 router.get('/user/parameters', function(req, res) {

@@ -9,14 +9,20 @@ class PlanetUser {
     }
     
     // Adds new planet to the user with given difficulty.
-    addNewPlanet(difficulty, callback) {
+    // addNewPlanet(difficulty, callback) {
+    addNewPlanet(planet_id, callback) {
         let self = this;
 
+        // let sql = "INSERT INTO planet_user (planet_id, user_id, energy, completed) \
+        //                 SELECT planet_id, ?, initial_energy, 0 \
+        //                 FROM planet \
+        //                 WHERE difficulty_level = ? \
+        //                 LIMIT 1";
         let sql = "INSERT INTO planet_user (planet_id, user_id, energy, completed) \
-                        SELECT planet_id, ?, initial_energy, 0 \
-                        FROM planet \
-                        WHERE difficulty_level = ? \
-                        LIMIT 1";
+                SELECT planet_id, ?, initial_energy, 0 \
+                FROM planet \
+                WHERE planet_id = ? \
+                LIMIT 1";
         
         pool.getConnection(function(con_err, con) {
             if(con_err) {
@@ -25,7 +31,7 @@ class PlanetUser {
                 return;
             }
             
-            con.query(sql, [self.user_id, difficulty], function (err, result) {
+            con.query(sql, [self.user_id, planet_id], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
                     console.log(err);
@@ -98,7 +104,7 @@ class PlanetUser {
         else if(self.user_id) {
             let sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
                         FROM planet_user NATURAL JOIN planet \
-                        WHERE user_id = ? AND completed = 0";   
+                        WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)";   
             pool.getConnection(function(con_err, con) {
                 if(con_err) {
                     console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -106,7 +112,7 @@ class PlanetUser {
                     return;
                 }
             
-                con.query(sql, [self.user_id], function (err, result) {
+                con.query(sql, [self.user_id, self.user_id], function (err, result) {
                     if (err) {
                         console.log('Error encountered on ' + Date());
                         console.log(err);
@@ -217,7 +223,7 @@ class PlanetUser {
         if(self.user_id) {
             let sql = "SELECT item_name, item_image, required_qty \
                         FROM planet_item_goal NATURAL JOIN planet_user NATURAL JOIN item \
-                        WHERE user_id = ? AND completed = 0";
+                        WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)";
             pool.getConnection(function(con_err, con) {
                 if(con_err) {
                     console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -225,7 +231,7 @@ class PlanetUser {
                     return;
                 }
                 
-                con.query(sql, [self.user_id], function (err, result) {
+                con.query(sql, [self.user_id, self.user_id], function (err, result) {
                     if (err) {
                         console.log('Error encountered on ' + Date());
                         console.log(err);
@@ -247,10 +253,11 @@ class PlanetUser {
         let self = this;
         
         if(self.user_id) {
+            //TODO only select items on current planet
             // planet_user_item may contain multiple entires for same item, so the owned quantity is aggregated 
             let sql = "SELECT item_id, MAX(item_name) item_name, MAX(item_image) item_image, SUM(owned_qty) owned_qty \
                         FROM planet_user_item NATURAL JOIN planet_user NATURAL JOIN item \
-                        WHERE user_id = ? AND completed = 0\
+                        WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)\
                         GROUP BY item_id \
                         HAVING SUM(owned_qty) > 0";
             pool.getConnection(function(con_err, con) {
@@ -260,7 +267,7 @@ class PlanetUser {
                     return;
                 }
                 
-                con.query(sql, [self.user_id], function (err, result) {
+                con.query(sql, [self.user_id, self.user_id], function (err, result) {
                     if (err) {
                         console.log('Error encountered on ' + Date());
                         console.log(err);
@@ -289,7 +296,7 @@ class PlanetUser {
                             WHERE build_end_time IS NULL\
                              ORDER BY build_start_time \
                         ) AS ir \
-                        WHERE user_id = ? AND completed = 0 \
+                        WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?) \
                             AND enabled = 1 ";
             pool.getConnection(function(con_err, con) {
                 if(con_err) {
@@ -298,7 +305,7 @@ class PlanetUser {
                     return;
                 }
                 
-                con.query(sql, [self.user_id], function (err, result) {
+                con.query(sql, [self.user_id, self.user_id], function (err, result) {
                     if (err) {
                         console.log('Error encountered on ' + Date());
                         console.log(err);
@@ -308,6 +315,36 @@ class PlanetUser {
                     }
                     
                     callback(null, result);
+                    con.release();
+                });
+            });
+        }
+    }
+    
+    
+    //Check whether the user has started the specified planet
+    isStarted(planet_id, callback) {
+        let self = this;
+        
+        if(self.user_id) {
+            let sql = "SELECT * FROM planet_user WHERE user_id = ? AND planet_id = ?";
+            pool.getConnection(function(con_err, con) {
+                if(con_err) {
+                    console.log("Error - " + Date() + "\nUnable to connect to database.");
+                    callback(con_err);
+                    return;
+                }
+                
+                con.query(sql, [self.user_id, planet_id], function (err, result) {
+                    if (err) {
+                        console.log('Error encountered on ' + Date());
+                        console.log(err);
+                        callback(err);
+                        con.release();
+                        return;
+                    }
+                    
+                    callback(null, result.length >= 1);
                     con.release();
                 });
             });
@@ -374,14 +411,14 @@ class PlanetUser {
                     FROM ( \
                         SELECT user_id, item_id, SUM(owned_qty) owned_qty \
                         FROM planet_user_item NATURAL JOIN planet_user \
-                        WHERE completed = 0 \
+                        WHERE planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?) \
                         GROUP BY user_id, item_id \
                         HAVING SUM(owned_qty) > 0 \
                     ) AS owned \
                     NATURAL RIGHT JOIN ( \
                         SELECT user_id, item_id, required_qty \
                         FROM planet_user NATURAL JOIN planet_item_goal \
-                        WHERE completed = 0 \
+                        WHERE planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?) \
                     ) AS goal \
                     WHERE user_id = ? \
                         AND COALESCE(owned_qty,0) < required_qty"; // Completed planet_user will return empty result 
@@ -393,7 +430,7 @@ class PlanetUser {
                 return;
             }
                 
-            con.query(sql, [self.user_id], function (err, result) {
+            con.query(sql, [self.user_id, self.user_id, self.user_id], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
                     console.log(err);
@@ -427,10 +464,10 @@ class PlanetUser {
                         
                         // If completed, update current planet `completed` field.
                         let update = "UPDATE planet_user \
-                                        SET completed = 1 \
-                                        WHERE user_id = ? AND completed = 0";
+                                        SET completed = 1, time_finished = NOW() \
+                                        WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)";
                                         
-                        con.query(update, [self.user_id], function(err_update) {
+                        con.query(update, [self.user_id, self.user_id], function(err_update) {
                             if (err_update) {
                                 console.log('Error encountered on ' + Date());
                                 console.log(err_update);
@@ -590,6 +627,5 @@ class PlanetUser {
     }
 
 }
-
 
 module.exports = PlanetUser;

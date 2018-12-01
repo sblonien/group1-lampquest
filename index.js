@@ -1,6 +1,6 @@
 let express = require("express");
 let app     = express();
-let path    = require("path"); //Required for sending files
+let path    = require("path"); // Required for sending files
 
 // Requierd for establishing user session
 let session = require('express-session');

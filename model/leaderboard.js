@@ -6,12 +6,17 @@ class Leaderboard {
     }
 
     getScores(callback) {
-        let sql = "SELECT @row := @row + 1 AS place, username, score FROM (SELECT username, (3 * SUM(completed) + experience) AS score \
-            FROM user NATURAL JOIN planet_user \
+        let sql = "SELECT @row := @row + 1 AS place, username, score FROM ( \
+                SELECT username, \
+                ROUND(100000 * SUM(completed) \
+                / (SUM(TIMESTAMPDIFF(SECOND, planet_user.time_started, planet_user.time_finished) \
+                * planet.difficulty_level))) AS score \
+            FROM user NATURAL JOIN planet_user NATURAL JOIN planet \
             GROUP BY user_id \
             ORDER BY score DESC \
             LIMIT 5) u, (select @row := 0) r;";
 
+        // OLD LEADERBOARD
         // let sql = "SELECT username, (3 * SUM(completed) + experience) AS score \
         //             FROM user NATURAL JOIN planet_user \
         //             GROUP BY user_id \

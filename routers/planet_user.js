@@ -129,14 +129,11 @@ router.get('/planet_user/check_if_completed', function(req, res) {
     let user = new User(req.session.uname, req.session.pword);
     
     user.getParameters(function(err_user, user_response) {
-		
-        if (err_user) {
+        if (err_user || user_response.user_id == null) {
             res.status(500);
             res.send(err_user);
-        }
-            
-        
-        let planet_user = new PlanetUser(user_response.user_id);
+        } else {
+            let planet_user = new PlanetUser(user_response.user_id);
         planet_user.checkIfCompleted(function(err, result, all_completed) {
             if (err) {
                 res.status(500);
@@ -153,6 +150,7 @@ router.get('/planet_user/check_if_completed', function(req, res) {
                 res.send({'completed':false});
             }
         });
+        }
     });
 });
 

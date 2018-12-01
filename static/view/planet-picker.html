@@ -1,15 +1,16 @@
-<div class="row" ng-controller="planetPickerController">
-  <div class="col-sm-6">
+<!-- List of easy planets -->
+<div class="row" ng-controller="planetPicker">
+  <div class="col-sm-4" ng-controller="easyPlanetsPicker" ng-controller="nightControl">
     <div class="card border-dark w-45">
         <div class="card-header">
-            <b>Planets</b>
+            <b>Easy Planets</b>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item" ng-repeat="planet in planetData.planets">
                 <div class="card border-dark">
                     <div class="row no-gutters">
                         <div class="align-self-center">
-                            <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 120px; max-width: 120px;">
+                            <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
                         <div class="col">
                             <div class="card-block p-1">
@@ -17,7 +18,65 @@
                                 <p class="card-text small">
                                     Difficulty Level: {{planet[0].difficulty_level}}
                                 </p>
-                                <a href="planet/addPlanet?planet_id={{planet[0].planet_id}}" class="btn btn-primary btn-sm">Go!</a>
+                                <a href="planet/goToPlanet?planet_id={{planet[0].planet_id}}" class="btn btn-primary btn-sm">Go!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+            </li>
+        </ul>
+    </div>
+  </div>
+  
+  <!-- List of intermediate planets -->
+  <div class="col-sm-4" ng-controller="intermediatePlanetsPicker" ng-controller="nightControl">
+    <div class="card border-dark w-45">
+        <div class="card-header">
+            <b>Intermediate Planets</b>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" ng-repeat="planet in planetData.planets">
+                <div class="card border-dark">
+                    <div class="row no-gutters">
+                        <div class="align-self-center">
+                            <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 90px; max-width: 90px;">
+                        </div>
+                        <div class="col">
+                            <div class="card-block p-1">
+                                <h6 class="card-title">{{planet[0].planet_name}}</h6>
+                                <p class="card-text small">
+                                    Difficulty Level: {{planet[0].difficulty_level}}
+                                </p>
+                                <a href="planet/goToPlanet?planet_id={{planet[0].planet_id}}" class="btn btn-primary btn-sm">Go!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+            </li>
+        </ul>
+    </div>
+  </div>
+  
+  <!-- List of hard planets -->
+  <div class="col-sm-4" ng-controller="hardPlanetsPicker" ng-controller="nightControl">
+    <div class="card border-dark w-45">
+        <div class="card-header">
+            <b>Hard Planets</b>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" ng-repeat="planet in planetData.planets">
+                <div class="card border-dark">
+                    <div class="row no-gutters">
+                        <div class="align-self-center">
+                            <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 90px; max-width: 90px;">
+                        </div>
+                        <div class="col">
+                            <div class="card-block p-1">
+                                <h6 class="card-title">{{planet[0].planet_name}}</h6>
+                                <p class="card-text small">
+                                    Difficulty Level: {{planet[0].difficulty_level}}
+                                </p>
+                                <a href="planet/goToPlanet?planet_id={{planet[0].planet_id}}" class="btn btn-primary btn-sm">Go!</a>
                             </div>
                         </div>
                     </div>

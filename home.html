@@ -15,12 +15,18 @@
                 justify-content: center;
                 align-items: center;
             }
+            
+            .night{
+                background-color: #1b3363;
+                color: black;
+            }
+            
       </style>
     <script src = "scripts/lib/angular.min.js"></script>
     <script src = "scripts/lib/angular-route.min.js"></script>
     <title>LampQuest</title>
   </head>
-  <body ng-app="mainApp">
+  <body ng-app="mainApp" class="{{bkgClr}}" ng-controller="nightControl">
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
         <!-- Brand/logo -->
         <a class="navbar-brand" href="#">LampQuest</a>
@@ -39,18 +45,22 @@
         </ul>
         <ul class="navbar-nav  ml-auto">
             <li class="nav-item">
-            <a class="nav-link" href="/user/signout">Sign Out</a>
+                <a class="nav-link" href="/user/signout">Sign Out</a>
+            </li>
+            <li class="nav-item">
+                <btn class="nav-link btn btn-secondary" ng-click="switchMode()">{{modeDisplay}}</btn>
             </li>
         </ul>
     </nav>
-    <div class="container-fluid"  ng-controller="planetParameters" >
+    <div class="container-fluid"  ng-controller="planetParameters">
         <div class="row">
             <!-- Main Content -->
             <div class="col-sm-8 p-2" ng-view>
             </div>
             <!-- Side Contents-->
             <div class="col-sm-4 p-2">
-                <div class="card border-secondary mb-3" >
+                <!-- Information about this planet -->
+                <div class="card border-secondary mb-3" style="{{pnlColor}}">
                     <div class="card-header" ng-controller="userParameters">
                         <span width="50%" class="float-sm-left"><i class="fas fa-user"></i>&nbsp;&nbsp;<a href='#'>{{username}}</a></span>
                         <span width="50%" class="float-sm-right">Experience: {{experience}}</span>
@@ -61,10 +71,11 @@
                         <img src="img/planet/{{planet_image}}" alt="{{planet_name}}" class="img-thumbnail" width="300px">
                     </div>
                     <ul class="list-group list-group-flush text-center">
-                        <li class="list-group-item"><b>Energy Available: <i class="fas fa-burn"></i> {{energy}}</b></li>
+                        <li class="list-group-item" style="{{pnlColor}}"><b>Energy Available: <i class="fas fa-burn"></i> {{energy}}</b></li>
                     </ul>
                 </div>
-                <div class="card border-secondary mb-3 text-center">
+                <!-- Resources Required for this planet -->
+                <div class="card border-secondary mb-3 text-center" style="{{pnlColor}}">
                     <div class="card-header">
                         <b>Resources Required</b>
                     </div>
@@ -82,10 +93,11 @@
                                     <td>{{item.required_qty}}</td>
                                 </tr>
                             </tbody>
-                        </table>
+                        </table> 
                     </div>
                 </div>
-                <div class="card border-secondary mb-3 text-center" ng-controller="friendLeaderboard">
+                <!-- Friends list-->
+                <div class="card border-secondary mb-3 text-center" ng-controller="friendLeaderboard" style="{{pnlColor}}">
                     <div class="card-header">
                         <b>Friends</b>
                     </div>
@@ -110,7 +122,7 @@
                             <div class="form-group">
                                 <label for="addFriend" class="sr-only">Username</label>
                                 <div class="center-container">
-                                    <input type="text" name="inputFriend" ng-model="inputFriend" class="form-control" style="width: 50%;" placeholder="Username" minlength="3" maxlength="255" required not-friend not-self username-exists autofocus>
+                                    <input type="text" name="inputFriend" ng-model="inputFriend" class="form-control" style="width: 50%;" placeholder="Username" minlength="3" maxlength="255" required not-friend not-self username-exists>
                                 </div>
                                 <div class="text-danger" ng-show = "addFriend.inputFriend.$dirty && addFriend.inputFriend.$invalid">
                                     <span ng-show = "addFriend.inputFriend.$error.notFriend">That user is already a friend.</span>
@@ -132,8 +144,16 @@
                             <p> </p>
                             <button class="btn btn-primary" click="showFriendLeaderboard">Show Friend Leaderboard</button>
                         </div>-->
-                        
                     </div>
+                </div>
+                <!-- Modify Account -->
+                <div class="card border-secondary mb-3 text-center" ng-controller="modifyAccount" style="{{pnlColor}}">
+                    <div class="card-header">
+                        <b>Modify Account</b>
+                    </div>
+                     <div class="card-body">
+                         <a href="/user/delete_account"><button class="btn btn-md btn-primary">Delete Account</button></a>
+                     </div>
                 </div>
             </div>
         </div>

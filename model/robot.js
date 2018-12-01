@@ -91,6 +91,7 @@ class Robot {
     
     // Fetch all robot_ids that the user own. 
     fetchAllRobotIds(user_id, callback) {
+        //TODO must only get robots for current planet
         let sql = "SELECT robot_id \
                     FROM robot \
                           NATURAL JOIN planet_user  \

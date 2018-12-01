@@ -27,6 +27,7 @@ class User {
                 return;
             }
             
+            if(self.username && self.password)
             con.query(sql, [self.username, md5(self.password)], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -58,6 +59,7 @@ class User {
                 return;
             }
             
+            if(self.username && self.password)
             con.query(sql, [self.username], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -94,7 +96,8 @@ class User {
                         callback(con_err);
                         return;
                     }
-            
+                    
+                    if(self.username && self.password)
                     con.query(sql, [self.username, md5(self.password)], function (err, result) {
                         if (err) {
                             console.log('Error encountered on ' + Date());
@@ -128,7 +131,7 @@ class User {
         
     }
     
-    // Fetch user parameters (user_id, username, experience) from the database
+    // Fetch user parameters (user_id, username, experience, current_planet_id) from the database
     getParameters(callback) {
         let self = this;
         // First check if user is valid 
@@ -138,7 +141,7 @@ class User {
                 return;
             }
             if(valid) {
-                let sql = "SELECT user_id, username, experience FROM user WHERE username = ? AND password = ?";
+                let sql = "SELECT user_id, username, experience, current_planet_id FROM user WHERE username = ? AND password = ?";
                 pool.getConnection(function(con_err, con) {
                     if(con_err) {
                         console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -146,6 +149,7 @@ class User {
                         return;
                     }
             
+                    if(self.username && self.password)
                     con.query(sql, [self.username, md5(self.password)], function (err, result) {
                         if (err) {
                             console.log('Error encountered on ' + Date());
@@ -170,6 +174,61 @@ class User {
         });
     };
     
+    setCurrentPlanet(planet_id, callback) {
+        let self = this;
+        let sql = "UPDATE user SET current_planet_id = ? WHERE user_id = ? AND PASSWORD = ?";
+        
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            if(self.username && self.password)
+            con.query(sql, [planet_id, self.username, md5(self.password)], function (err, result) {
+                if (err) {
+                    console.log('Error encountered on ' + Date());
+                    console.log(err);
+                    callback(err);
+                    con.release();
+                    return;
+                } 
+                
+                callback(null);
+                con.release();
+            });
+        });
+    }
+    
+    setOnline(isOnline, callback) {
+        let self = this;
+        let sql = "UPDATE user SET is_online = ? WHERE username = ? AND password = ?";
+        
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            console.error('Setting ' + self.username + ' to be online: ' + isOnline);
+            if(self.username && self.password)
+                con.query(sql, [isOnline, self.username, md5(self.password)], function (err, result) {
+                    if (err) {
+                        console.log('Error encountered on ' + Date());
+                        console.log(err);
+                        callback(err);
+                        con.release();
+                        return;
+                    } 
+                    
+                    callback(null, result);
+                    con.release();
+                });
+        });
+    }
+    
     addFriend(username, callback) {
         let self = this;
         let sql = "INSERT INTO friends VALUES \
@@ -182,7 +241,7 @@ class User {
                 callback(con_err);
                 return;
             }
-            
+            if(self.username && self.password)
             con.query(sql, [self.username, md5(self.password), username], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -212,6 +271,7 @@ class User {
                 return;
             }
             
+            if(self.username && self.password)
             con.query(sql, [self.username, md5(self.password), friend], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -240,6 +300,7 @@ class User {
                 return;
             }
             
+            if(self.username && self.password)
             con.query(sql, [self.username, md5(self.password)], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -248,9 +309,10 @@ class User {
                     con.release();
                     return;
                 } 
-                
-                callback(err, result);
-                con.release();
+                if(result) {
+                    callback(null, result);
+                    con.release();
+                }
             });
         });
     }
@@ -271,6 +333,7 @@ class User {
                 return;
             }
             
+            if(self.username && self.password)
             con.query(sql, [self.username, md5(self.password)], function (err, result) {
                 if (err) {
                     console.log('Error encountered on ' + Date());
@@ -280,7 +343,56 @@ class User {
                     return;
                 } 
                 
-                callback(err, result);
+                callback(null, result);
+                con.release();
+            });
+        });
+    }
+    
+    // Delete a user including evyerthing he produced
+    deleteUser(callback) {
+        let self = this;
+        // Delete everything in planet_user_item for this user
+        let sql1 = "DELETE FROM planet_user_item WHERE planet_user_id IN \
+        (SELECT planet_user_id FROM planet_user WHERE user_id = \
+        (SELECT user_id FROM user WHERE username = ? LIMIT 1)); ";
+        // Delete everything in item_robot for this user
+        let sql2 = "DELETE FROM item_robot WHERE robot_id IN \
+        (SELECT robot_id FROM robot WHERE planet_user_id = \
+        (SELECT planet_user_id FROM planet_user WHERE user_id = \
+        (SELECT user_id FROM user WHERE username = ? LIMIT 1) LIMIT 1)); "
+        // Delete everything in robot for this user
+        let sql3 = "DELETE FROM robot WHERE planet_user_id = \
+        (SELECT planet_user_id FROM planet_user WHERE user_id = \
+        (SELECT user_id FROM user WHERE username = ? LIMIT 1) LIMIT 1); ";
+        // Delete everything in planet_user for this user
+        let sql4 = "DELETE FROM planet_user WHERE user_id = \
+        (SELECT user_id FROM user WHERE username = ?); ";
+        // Delete everything in user for this user
+        let sql5 = "DELETE FROM user WHERE username = ?; ";
+        
+        // Put it all together to execute all at once
+        let sql = sql1 + sql2 + sql3 + sql4 + sql5;
+        
+        
+        pool.getConnection(function(con_err, con) {
+            if(con_err) {
+                console.log("Error - " + Date() + "\nUnable to connect to database.");
+                callback(con_err);
+                return;
+            }
+            
+            if(self.username && self.password)
+            con.query(sql, [self.username, self.username, self.username, self.username, self.username], function (err, result) {
+                if (err) {
+                    console.log('Error encountered on ' + Date());
+                    console.log(err);
+                    callback(err);
+                    con.release();
+                    return;
+                } 
+                
+                callback(null, result);
                 con.release();
             });
         });
