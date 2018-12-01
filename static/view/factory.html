@@ -1,12 +1,12 @@
-<div class="row" ng-controller="robotTypes; nightControl">
+<div class="row" ng-controller="robotTypes">
   <div class="col-sm-6">
-    <div class="card border-dark w-45">
+    <div class="card border-dark w-45" ng-controller="nightControl" style="{{pnlColor}}">
         <div class="card-header">
             <b>Combiners</b>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item" ng-repeat="row in combiners">
-                <div class="card  border-dark">
+                <div class="card  border-dark" style="{{pnlColor}}">
                     <div class="row no-gutters">
                         <div class="align-self-center">
                             <img src="img/robot/{{row.image}}" style="max-height: 90px; max-width: 90px;">
@@ -30,7 +30,7 @@
     </div>
   </div>
   <div class="col-sm-6">
-    <div class="card border-dark w-45">
+    <div class="card border-dark w-45" ng-controller="nightControl">
         <div class="card-header">
             <b>Diffusors</b>
         </div>
