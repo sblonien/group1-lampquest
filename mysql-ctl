@@ -1,0 +1,265 @@
+#!/bin/bash
+
+if ! [ $# -eq 1 ]
+then
+    echo "Usage: `basename $0` [start|restart|stop|status|cli|install]"
+    exit 1
+fi
+
+# Ensure script always runs as root
+if [ "$UID" != "0" ]; then
+    sudo -E $0 "$@"
+    exit
+fi
+
+if [ -f /etc/profile.d/cloud9.sh ]; then
+    . /etc/profile.d/cloud9.sh
+fi
+
+if [ -z "$C9_USER" ]; then
+    echo "C9_USER Environment variable not found. Please run with sudo -E"
+    exit 1
+fi
+
+export STOPTIMEOUT=10
+
+MYSQLD=$HOME/.nada-nix-profile/bin/mysqld_safe
+if [ ! -f $MYSQLD ]; then
+  MYSQLD=/usr/bin/mysqld_safe
+fi
+
+USERNAME=${C9_USER:0:16}
+DBNAME=c9
+
+
+load_config() {
+    USING_OLD_DIR=
+    MYSQL_DATA_DIR="/var/lib/mysql"
+    MYSQL_CONFIG_DIR="/etc/mysql"
+    MYSQL_USERNAME_FILE="$MYSQL_CONFIG_DIR/mysql-$USERNAME.cnf"
+    MYSQL_RUN_DIR="/var/run/mysqld"
+    MYSQL_SOCKET_FILE="/var/run/mysqld/mysqld.sock"
+    MYSQL_LOG_DIR="/var/log/mysql"
+    MYSQL_ERROR_LOG_FILENAME="error.log"
+    MYSQL_OLD_HOME="$HOME/lib/mysql"
+    if [ -d $MYSQL_OLD_HOME ]; then 
+        MYSQL_CONFIG_DIR="$MYSQL_OLD_HOME/etc"
+        MYSQL_RUN_DIR="$MYSQL_OLD_HOME/pid"
+        MYSQL_SOCKET_FILE="$MYSQL_OLD_HOME/socket/mysql.sock"
+        MYSQL_LOG_DIR="$MYSQL_OLD_HOME/log"
+        MYSQL_DATA_DIR="$MYSQL_OLD_HOME/data"
+        MYSQL_ERROR_LOG_FILENAME="mysql_error.log"
+        USING_OLD_DIR=1
+    fi
+    MYSQL_IP="127.0.0.1"
+}
+
+load_config # Load it immediately
+
+isrunning() {
+    if [ -f $MYSQL_RUN_DIR/mysqld.pid ]; then
+        mysql_pid=`cat $MYSQL_RUN_DIR/mysqld.pid 2> /dev/null`
+        myid=`id -u`
+        if `ps --pid $mysql_pid > /dev/null 2>&1` || `pgrep -x mysqld_safe -u $myid > /dev/null 2>&1`
+        then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+isinstalled() {
+    if [ $USING_OLD_DIR ]; then
+        return 0
+    fi
+    if [ -f $MYSQL_USERNAME_FILE ]; then
+        return 0
+    fi
+    return 1
+}
+
+start() {
+    if ! isinstalled
+    then
+        install
+    fi
+
+    if [ ! $USING_OLD_DIR ]; then
+        service mysql start
+        return $? 
+    fi
+    
+    # Fix permissions, because these break all the time with the old install. 
+    chown -R ubuntu. $MYSQL_OLD_HOME
+    
+    if ! isrunning
+    then
+        sudo -u ubuntu -i $MYSQLD --defaults-file=$MYSQL_CONFIG_DIR/my.cnf >/dev/null 2>&1 &
+        if [ $? -ne 0 ]; then
+            echo "Failed to start MySQL. Please check $MYSQL_LOG_DIR/$MYSQL_ERROR_LOG_FILENAME for more information."
+            return 1
+        fi
+        echo "Successfully started mysql"
+    else
+        echo "MySQL already running" 1>&2
+    fi
+}
+
+start_debug() {
+    if ! isrunning
+    then
+        # Fix permissions, because these break all the time with the old install. 
+        chown -R ubuntu. $MYSQL_OLD_HOME
+        
+        sudo -u ubuntu -i $MYSQLD --defaults-file=$MYSQL_CONFIG_DIR/my.cnf | tee /tmp/mysql_debug.log &
+    fi
+}
+
+stop() {
+    if [ ! $USING_OLD_DIR ]; then
+        service mysql stop
+        return $? 
+    fi
+    
+    if [ -f $MYSQL_RUN_DIR/mysqld.pid ]; then
+        pid=$( /bin/cat $MYSQL_RUN_DIR/mysqld.pid )
+        /bin/kill $pid
+        ret=$?
+        if [ $ret -eq 0 ]; then
+            TIMEOUT="$STOPTIMEOUT"
+            while [ $TIMEOUT -gt 0 ] && [ -f "$MYSQL_RUN_DIR/mysqld.pid" ]; do
+                /bin/kill -0 "$pid" >/dev/null 2>&1 || break
+                sleep 1
+                let TIMEOUT=${TIMEOUT}-1
+            done
+        fi
+    else
+        if `pgrep -x mysqld_safe > /dev/null 2>&1`
+        then
+            echo "Warning: MySQL process exists without a pid file.  Use force-stop to kill." 1>&2
+        else
+            echo "MySQL already stopped" 1>&2
+        fi
+    fi
+}
+
+wait_to_start_db() {
+    i=0
+    while true; do
+        echo ';' | mysql -u root -S "${MYSQL_SOCKET_FILE}" &> /dev/null && break
+        echo ';' | mysql -h $MYSQL_IP -u $USERNAME &> /dev/null && break
+        [ -f "${MYSQL_RUN_DIR}/mysqld.pid" ] && break
+        
+        [ $i -gt 30 ] && { return 1; }
+            
+        sleep 1
+        i=$(($i + 1))
+    done
+}
+
+write_config() {
+    echo "$USERNAME" > $MYSQL_USERNAME_FILE 
+}
+
+install() {
+    if isinstalled; then
+        read -p "It looks like MySQL is already installed, reinstalling will wipe all existing data and start again, are you sure you wish to continue? [y/N] " -n 1 -r
+        echo    # move to a new line
+        if [[ ! $REPLY =~ ^[Yy]$ ]]
+        then
+            exit 1
+        fi 
+    fi
+    
+    echo "Installing MySQL"
+    
+    # Delete the entire old MySQL installation and use system provided mysql now.
+    if [ -d $MYSQL_OLD_HOME ]; then
+        rm -rf $MYSQL_OLD_HOME
+        load_config
+    fi
+    
+    stop || { echo "Failed to stop old MySQL process"; exit 1; }
+    write_config
+
+    mysql_install_db --defaults-file=$MYSQL_CONFIG_DIR/my.cnf &> /dev/null
+    start || { echo "Failed to start MySQL"; exit 1; }
+
+    wait_to_start_db || { echo "DB Failed to start"; exit 1; }
+
+    echo "drop database test" | mysql -u root -S "${MYSQL_SOCKET_FILE}" &> /dev/null
+    
+    echo "create database IF NOT EXISTS \`${DBNAME}\` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" | mysql -u root -S "${MYSQL_SOCKET_FILE}" &> /dev/null || { echo "Failed to create default database"; exit 1; }
+
+    echo "grant all on *.* to '$USERNAME'@'%' with grant option;
+    flush privileges;" | mysql -u root -S "${MYSQL_SOCKET_FILE}" mysql > /dev/null || echo "Failed to setup initial root user"
+
+    echo ""
+    echo "MySQL 5.5 database added.  Please make note of these credentials:"
+    echo ""
+    echo "       Root User: $USERNAME"
+    echo "   Database Name: ${DBNAME}"
+    echo ""
+}
+
+backup_mysqldir() {
+    postfix=`date +"%Y%m%d"`
+    target="/tmp/mysql-bu_${postfix}.tgz"
+    tar cfz $target ${MYSQL_DATA_DIR} 2>/dev/null
+    echo "back-up created: $target"
+}
+
+cli() {
+    if ! isrunning
+    then
+        echo "Starting MySQL ..."
+        start
+        wait_to_start_db
+    fi
+
+    if mysql -h $MYSQL_IP -u $USERNAME </dev/null &>/dev/null; then
+        mysql -h $MYSQL_IP -u $USERNAME
+    else 
+        mysql -h $MYSQL_IP -u $USERNAME -p
+    fi
+}
+
+case "$1" in
+    start)
+        start
+    ;;
+    stop)
+        stop
+    ;;
+    install)
+        install
+    ;;
+    restart)
+        stop
+        start
+    ;;
+    cli)
+        cli
+    ;;
+    status)
+        if isrunning
+        then
+            echo "MySQL is running" 1>&2
+        else
+            echo "MySQL is stopped" 1>&2
+        fi
+        exit 0
+    ;;
+    debug)
+        start_debug
+    ;;
+    backup)
+        backup_mysqldir
+    ;;
+    writeconfig)
+        write_config
+    ;;
+    *)
+        echo "Usage: `basename $0` [start|restart|stop|status|cli|install]"
+    ;;
+esac
