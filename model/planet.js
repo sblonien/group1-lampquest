@@ -34,6 +34,7 @@ class Planet {
                 }
                 
                 callback(null, result);
+                con.release();
             });
         });
     }
@@ -63,6 +64,7 @@ class Planet {
                     ids.push(item.planet_id);
                     if(ids.length == result.length) callback(null, ids);
                 });
+                con.release();
             });
 
         });            
@@ -94,6 +96,8 @@ class Planet {
                     ids.push(item.planet_id);
                     if(ids.length == result.length) callback(null, ids);
                 });
+                
+                con.release();
             });
         });            
     }
@@ -203,20 +207,9 @@ class Planet {
                 return;
             }
             
-            if(result === true) {
-                user.setCurrentPlanet(planet_id, function(err) {
-                    if(err) {
-                        console.log('Error encountered on ' + Date());
-                        console.log(err);
-                        callback(err);
-                        return;
-                    }
-                    
-                    callback(null, true);
-                });
-            } 
-            
-            else {
+            // Only if the user has not started the planet
+            if(result === false) {
+                console.log("Adding new planet in goToPlanet.");
                 planet_user.addNewPlanet(planet_id, function(err, result1) {
                     if(err) {
                         console.log('Error encountered on ' + Date());
@@ -224,7 +217,6 @@ class Planet {
                         callback(err);
                         return;
                     }
-                    
                     user.setCurrentPlanet(planet_id, function(err) {
                         if(err) {
                             console.log('Error encountered on ' + Date());
@@ -232,9 +224,19 @@ class Planet {
                             callback(err);
                             return;
                         }
-                        
                         callback(null, true);
                     });
+                });
+            } else {
+                console.log("Going to existing planet.");
+                user.setCurrentPlanet(planet_id, function(err) {
+                    if(err) {
+                        console.log('Error encountered on ' + Date());
+                        console.log(err);
+                        callback(err);
+                        return;
+                    }
+                    callback(null, false);
                 });
             }
         });

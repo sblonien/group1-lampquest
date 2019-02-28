@@ -19,6 +19,10 @@
             .night{
                 background-color: #1b3363;
                 color: black;
+                background: url(img/background_main.jpg);
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center center;
             }
             
       </style>
@@ -59,9 +63,10 @@
             </div>
             <!-- Side Contents-->
             <div class="col-sm-4 p-2">
+                
                 <!-- Information about this planet -->
                 <div class="card border-secondary mb-3" style="{{pnlColor}}">
-                    <div class="card-header" ng-controller="userParameters">
+                    <div class="card-header" ng-controller="userParameters" style="{{hColor}}">
                         <span width="50%" class="float-sm-left"><i class="fas fa-user"></i>&nbsp;&nbsp;<a href='#'>{{username}}</a></span>
                         <span width="50%" class="float-sm-right">Experience: {{experience}}</span>
                     </div>
@@ -71,12 +76,14 @@
                         <img src="img/planet/{{planet_image}}" alt="{{planet_name}}" class="img-thumbnail" width="300px">
                     </div>
                     <ul class="list-group list-group-flush text-center">
-                        <li class="list-group-item" style="{{pnlColor}}"><b>Energy Available: <i class="fas fa-burn"></i> {{energy}}</b></li>
+                        <li class="list-group-item" style="{{hColor}}"><b>Energy Available: <i class="fas fa-burn"></i> {{energy}}</b></li>
                     </ul>
                 </div>
+                <!-- End Planet information -->
+                
                 <!-- Resources Required for this planet -->
                 <div class="card border-secondary mb-3 text-center" style="{{pnlColor}}">
-                    <div class="card-header">
+                    <div class="card-header" style="{{hColor}}">
                         <b>Resources Required</b>
                     </div>
                     <div class="card-body">
@@ -96,9 +103,11 @@
                         </table> 
                     </div>
                 </div>
+                <!-- End reources required -->
+                
                 <!-- Friends list-->
                 <div class="card border-secondary mb-3 text-center" ng-controller="friendLeaderboard" style="{{pnlColor}}">
-                    <div class="card-header">
+                    <div class="card-header" style="{{hColor}}">
                         <b>Friends</b>
                     </div>
                     <div class="card-body">
@@ -106,7 +115,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
-                                    <th scope="col">Points</th>
+                                    <th scope="col">Online</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -122,7 +131,7 @@
                             <div class="form-group">
                                 <label for="addFriend" class="sr-only">Username</label>
                                 <div class="center-container">
-                                    <input type="text" name="inputFriend" ng-model="inputFriend" class="form-control" style="width: 50%;" placeholder="Username" minlength="3" maxlength="255" required not-friend not-self username-exists>
+                                    <input type="text" name="inputFriend" ng-model="inputFriend" class="form-control" style="width: 50%;" placeholder="Username" minlength="3" maxlength="255" required not-friend not-self username-exists autofocus>
                                 </div>
                                 <div class="text-danger" ng-show = "addFriend.inputFriend.$dirty && addFriend.inputFriend.$invalid">
                                     <span ng-show = "addFriend.inputFriend.$error.notFriend">That user is already a friend.</span>
@@ -139,25 +148,32 @@
                                 </div>
                             </div>
                         </form>
-                       <!-- <div>
-                            <button class="btn btn-primary" click="showGlobalLeaderboard">Show Global Leaderboard</button>
-                            <p> </p>
-                            <button class="btn btn-primary" click="showFriendLeaderboard">Show Friend Leaderboard</button>
-                        </div>-->
+                        <!--<div>-->
+                        <!--    <button class="btn btn-primary" click="showGlobalLeaderboard">Show Global Leaderboard</button>-->
+                        <!--    <p> </p>-->
+                        <!--    <button class="btn btn-primary" click="showFriendLeaderboard">Show Friend Leaderboard</button>-->
+                        <!--</div>-->
                     </div>
                 </div>
+                <!-- End friend list -->
+                
                 <!-- Modify Account -->
-                <div class="card border-secondary mb-3 text-center" ng-controller="modifyAccount" style="{{pnlColor}}">
-                    <div class="card-header">
+                <div class="card border-secondary mb-3 text-center" style="{{pnlColor}}">
+                <!--div class="card border-secondary mb-3 text-center" ng-controller="modifyAccount" style="{{pnlColor}}"-->
+                    <div class="card-header" style="{{hColor}}">
                         <b>Modify Account</b>
                     </div>
                      <div class="card-body">
                          <a href="/user/delete_account"><button class="btn btn-md btn-primary">Delete Account</button></a>
                      </div>
                 </div>
+                <!-- End modify account -->
             </div>
+            <!-- End side contents -->
         </div>
+        <!-- end row -->
     </div>
+    <!-- end container-fluid -->
     
     <!-- Modal Confirm Revert All Start -->
     <div class="modal fade" tabindex="-1" role="dialog" id="confirmRevert">

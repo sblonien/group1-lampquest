@@ -1,19 +1,21 @@
 <div class="row" ng-controller="robotTypes">
+    
+  <!-- List of combiners -->
   <div class="col-sm-6">
-    <div class="card border-dark w-45" ng-controller="nightControl" style="{{pnlColor}}">
+    <div class="card border-dark w-45" style="{{hColor}}">
         <div class="card-header">
             <b>Combiners</b>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="row in combiners">
+        <ul class="list-group list-group-flush" style="{{pnlColor}}">
+            <li class="list-group-item" ng-repeat="row in combiners" style="{{pnlColor}}">
                 <div class="card  border-dark" style="{{pnlColor}}">
-                    <div class="row no-gutters">
-                        <div class="align-self-center">
+                    <div class="row no-gutters" style="{{pnlColor}}">
+                        <div class="align-self-center" style="{{pnlColor}}">
                             <img src="img/robot/{{row.image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
-                        <div class="col">
-                            <div class="card-block p-1">
-                                <h6 class="card-title">{{row.robot_type}}</h6>
+                        <div class="col" style="{{pnlColor}}">
+                            <div class="card-block p-1" style="{{pnlColor}}">
+                                <h6 class="card-title" style="{{pnlColor}}">{{row.robot_type}}</h6>
                                 <p class="card-text small">
                                     Produces <i ng-repeat="item in row.produce">{{item.item}}</i> every {{row.time_req}} sec.<br/>
                                     Requires <i ng-repeat="item in row.consume">{{item.item}} ({{item.qty}}), </i><br/>
@@ -29,21 +31,23 @@
         </ul>
     </div>
   </div>
+  
+  <!-- List of diffusors -->
   <div class="col-sm-6">
-    <div class="card border-dark w-45" ng-controller="nightControl">
+    <div class="card border-dark w-45" style="{{hColor}}">
         <div class="card-header">
             <b>Diffusors</b>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="row in diffusors">
-                <div class="card  border-dark">
-                    <div class="row no-gutters">
-                        <div class="align-self-center">
+        <ul class="list-group list-group-flush" style="{{pnlColor}}">
+            <li class="list-group-item" ng-repeat="row in diffusors" style="{{pnlColor}}">
+                <div class="card  border-dark" style="{{pnlColor}}">
+                    <div class="row no-gutters" style="{{pnlColor}}">
+                        <div class="align-self-center" style="{{pnlColor}}">
                             <img src="img/robot/{{row.image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
-                        <div class="col">
-                            <div class="card-block p-1">
-                                <h6 class="card-title">{{row.robot_type}}</h6>
+                        <div class="col" style="{{pnlColor}}">
+                            <div class="card-block p-1" style="{{pnlColor}}">
+                                <h6 class="card-title" style="{{pnlColor}}">{{row.robot_type}}</h6>
                                 <p class="card-text small">
                                     Produces <i ng-repeat="item in row.produce">{{item.item}} ({{item.qty}}), </i> every {{row.time_req}} sec.<br/>
                                     Requires <i ng-repeat="item in row.consume">{{item.item}}</i><br/>
@@ -59,5 +63,6 @@
             </li>
         </ul>
     </div>
-</div>
+ </div>
+
 </div>

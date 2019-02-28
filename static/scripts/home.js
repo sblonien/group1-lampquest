@@ -196,18 +196,16 @@ mainApp.controller('addFriendControl', function($scope, $http) {
     });
     
     $scope.addFriendSubmit = () => {
-        if($scope.inputFriend){
-            $http.post('/user/add_friend', {username: $scope.inputFriend}).then(function(response) {
+        console.error('In add friend1 with ' + ($scope.addFriend.inputFriend.$viewValue));
+        if($scope.addFriend.inputFriend.$viewValue){
+            console.error('In add friend2 with ' + $scope.addFriend.inputFriend.$viewValue);
+            $http.post('/user/add_friend', {username: $scope.addFriend.inputFriend.$viewValue}).then(function(response) {
                  $http.get('/user/friends').then(function(res) {
                     $scope.friend.leaderboardData = res.data;
                 });
             });
         }
     }
-});
-
-mainApp.controller('modifyAccount', function($scope, $http, $window) {
-    
 });
 
 //Custom Validator to check if that username exists
@@ -235,7 +233,7 @@ mainApp.directive('notFriend', ['$http', function($http) {
                 }); 
             };
         }
-    }; 
+    } 
 }]);
 
 //Custom Validator to check if that user is trying to add himself
@@ -249,13 +247,14 @@ mainApp.directive('notSelf', ['$http', function($http) {
                 }); 
             };
         }
-    };
+    } 
 }]);
 
 mainApp.controller('nightControl', function($scope, $http, $window) {
         $scope.mode = 'light';
         $scope.modeDisplay = 'Dark Mode';
         $scope.pnlColor = 'color: black;';
+        $scope.hColor = 'color: black;';
         $scope.bkgClr = '';
         
         $scope.switchMode = () => {
@@ -263,11 +262,13 @@ mainApp.controller('nightControl', function($scope, $http, $window) {
                 $scope.mode = 'dark';
                 $scope.modeDisplay = 'Light Mode';
                 $scope.pnlColor = 'background-color: #566584; color: white;';
+                $scope.hColor = 'background-color: #45408e; color: white;';
                 $scope.bkgClr = 'night';
             } else {
                 $scope.mode = 'light';
                 $scope.modeDisplay = 'Dark Mode';
                 $scope.pnlColor = 'color: black;';
+                $scope.hColor = 'color: black;';
                 $scope.bkgClr = '';
             }
         };

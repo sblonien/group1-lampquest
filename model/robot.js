@@ -496,13 +496,16 @@ class Robot {
         let robot_id = self.robot_id;
         
         let currTime = moment(); //Fetch current time
-        console.log("start time: " + start_time);
-        console.log("time req: " + time_required);
-        console.log("Current time: " + currTime.format());
+        // console.log("start time: " + start_time);
+        // console.log("time req: " + time_required);
+        // console.log("Current time: " + currTime.format());
         
         // Check if robot can build items 
         self.canBuild(self, function(err, can_build) {
-            if(err) callback(err);
+            if(err) {
+                callback(err);
+                return
+            }
             if(can_build) {
                 // If the production time ( = start_time + time_required) is greater than current time, then cannot produce
                 if(currTime.isBefore(moment(start_time).add(time_required,'seconds'))) {

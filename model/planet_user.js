@@ -12,6 +12,8 @@ class PlanetUser {
     // addNewPlanet(difficulty, callback) {
     addNewPlanet(planet_id, callback) {
         let self = this;
+        
+        console.log("Someone called addNewPlanet with " + planet_id);
 
         // let sql = "INSERT INTO planet_user (planet_id, user_id, energy, completed) \
         //                 SELECT planet_id, ?, initial_energy, 0 \
@@ -76,7 +78,7 @@ class PlanetUser {
         
         // If both planet id and user id are available, extract data for the particular planet and user
         if(self.user_id && self.planet_id) {
-            let sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
+            let sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level, planet_id \
                         FROM planet_user NATURAL JOIN planet \
                         WHERE user_id = ? AND planet_id = ?";
             pool.getConnection(function(con_err, con) {
@@ -104,7 +106,8 @@ class PlanetUser {
         else if(self.user_id) {
             let sql = "SELECT planet_user_id, planet_name, planet_image, difficulty_level \
                         FROM planet_user NATURAL JOIN planet \
-                        WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)";   
+                        WHERE user_id = ? AND completed = 0 \
+                        LIMIT 1";   
             pool.getConnection(function(con_err, con) {
                 if(con_err) {
                     console.log("Error - " + Date() + "\nUnable to connect to database.");
@@ -112,7 +115,7 @@ class PlanetUser {
                     return;
                 }
             
-                con.query(sql, [self.user_id, self.user_id], function (err, result) {
+                con.query(sql, [self.user_id], function (err, result) {
                     if (err) {
                         console.log('Error encountered on ' + Date());
                         console.log(err);
@@ -124,7 +127,7 @@ class PlanetUser {
                     if(result.length === 0) {
                         // No active planet found. 
                         // Check if there is new planet is available 
-                        let check_new = "SELECT MIN(difficulty_level) AS difficulty \
+                        let check_new = "SELECT planet_id, MIN(difficulty_level) AS difficulty \
                                         FROM planet \
                                         WHERE planet_id NOT IN ( \
                                                 SELECT planet_id \
@@ -145,7 +148,8 @@ class PlanetUser {
                                 callback(null, null);
                             }
                             else {
-                                self.addNewPlanet(result_new[0].difficulty, function(err_add, result_add) {
+                                console.log("Calling addNewPlanet in getParameters");
+                                self.addNewPlanet(result_new[0].planet_id, function(err_add, result_add) {
                                     if (err_add) {
                                         console.log('Error encountered on ' + Date());
                                         console.log(err_add);
@@ -343,8 +347,7 @@ class PlanetUser {
                         con.release();
                         return;
                     }
-                    
-                    callback(null, result.length >= 1);
+                    callback(null, result.length > 0);
                     con.release();
                 });
             });
@@ -460,7 +463,7 @@ class PlanetUser {
                             return;
                         }
 
-                        let difficulty = result_params.difficulty_level;
+                        let planet_id = result_params.planet_id;
                         
                         // If completed, update current planet `completed` field.
                         let update = "UPDATE planet_user \
@@ -477,7 +480,8 @@ class PlanetUser {
                             }
                             
                             // Add new planet of higher difficulty 
-                            self.addNewPlanet(difficulty + 1, function(err_new, result_new) {
+                            console.log("Calling addNewPlanet in checkIfCompleted");
+                            self.addNewPlanet(planet_id + 1, function(err_new, result_new) {
                                 if (err_new) {
                                     console.log('Error encountered on ' + Date());
                                     console.log(err_new);
@@ -490,7 +494,7 @@ class PlanetUser {
                                     
                                     // Add experience point to user
                                     let exp_pts = "UPDATE user SET experience = experience + ? WHERE user_id = ?";
-                                    con.query(exp_pts, [difficulty, self.user_id], function(err_exp) {
+                                    con.query(exp_pts, [planet_id, self.user_id], function(err_exp) {
                                         if (err_exp) {
                                             console.log('Error encountered on ' + Date());
                                             console.log(err_exp);
@@ -533,32 +537,32 @@ class PlanetUser {
         // Delete all log records for the planet 
         let del_log = "DELETE FROM item_robot \
                         WHERE robot_id IN ( \
-                            SELECT robot_id FROM robot NATURAL JOIN planet_user WHERE user_id = ? AND completed = 0 \
+                            SELECT robot_id FROM robot NATURAL JOIN planet_user WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?) \
                         )";
 
         let del_robots = "DELETE FROM robot \
                             WHERE planet_user_id = ( \
                                 SELECT planet_user_id \
                                 FROM planet_user \
-                                WHERE user_id = ? AND completed = 0 \
+                                WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?) \
                             )";
         
         let del_owned_items = "DELETE FROM planet_user_item \
                                WHERE planet_user_id = ( \
                                 SELECT planet_user_id \
                                 FROM planet_user \
-                                WHERE user_id = ? AND completed = 0 \
+                                WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?) \
                               )";
                               
         let insert_init_items = "INSERT INTO planet_user_item (planet_user_id, item_id, owned_qty) \
                                 SELECT planet_user_id, item_id, available_qty \
                                 FROM planet_item_init_resource NATURAL JOIN planet_user \
-                                WHERE user_id = ? AND completed = 0";
+                                WHERE user_id = ? AND planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)";
         
         let update_energy = "UPDATE planet_user pu \
                                 INNER JOIN  planet p ON  p.planet_id = pu.planet_id \
                              SET pu.energy = p.initial_energy \
-                             WHERE pu.user_id = ? AND completed = 0";
+                             WHERE pu.user_id = ? AND pu.planet_id = (SELECT current_planet_id FROM user WHERE user_id = ?)";
         
         pool.getConnection(function(con_err, con) {
             if(con_err) {
@@ -567,7 +571,7 @@ class PlanetUser {
                 return;
             }
             
-            con.query(del_log, [self.user_id], function (err_del_log) {
+            con.query(del_log, [self.user_id, self.user_id], function (err_del_log) {
                 if (err_del_log) {
                     console.log('Error encountered on ' + Date());
                     console.log(err_del_log);
@@ -576,7 +580,7 @@ class PlanetUser {
                     return;
                 }
                 
-                con.query(del_robots, [self.user_id], function (err_del_robots) {
+                con.query(del_robots, [self.user_id, self.user_id], function (err_del_robots) {
                     if (err_del_robots) {
                         console.log('Error encountered on ' + Date());
                         console.log(err_del_robots);
@@ -585,7 +589,7 @@ class PlanetUser {
                         return;
                     }
                     
-                    con.query(del_owned_items, [self.user_id], function (err_del_owned_items) {
+                    con.query(del_owned_items, [self.user_id, self.user_id], function (err_del_owned_items) {
                         if (err_del_owned_items) {
                             console.log('Error encountered on ' + Date());
                             console.log(err_del_owned_items);
@@ -594,7 +598,7 @@ class PlanetUser {
                             return;
                         }
                         
-                        con.query(insert_init_items, [self.user_id], function (err_insert_items) {
+                        con.query(insert_init_items, [self.user_id, self.user_id], function (err_insert_items) {
                             if (err_insert_items) {
                                 console.log('Error encountered on ' + Date());
                                 console.log(err_insert_items);
@@ -603,7 +607,7 @@ class PlanetUser {
                                 return;
                             }
                             
-                            con.query(update_energy, [self.user_id], function (err_update_energy) {
+                            con.query(update_energy, [self.user_id, self.user_id], function (err_update_energy) {
                                 if (err_update_energy) {
                                     console.log('Error encountered on ' + Date());
                                     console.log(err_update_energy);

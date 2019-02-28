@@ -1,19 +1,19 @@
 <!-- List of easy planets -->
 <div class="row" ng-controller="planetPicker">
-  <div class="col-sm-4" ng-controller="easyPlanetsPicker" ng-controller="nightControl">
-    <div class="card border-dark w-45">
+  <div class="col-sm-4" ng-controller="easyPlanetsPicker">
+    <div class="card border-dark w-45" style="{{hColor}}">
         <div class="card-header">
             <b>Easy Planets</b>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="planet in planetData.planets">
-                <div class="card border-dark">
-                    <div class="row no-gutters">
-                        <div class="align-self-center">
+        <ul class="list-group list-group-flush" style="{{pnlColor}}">
+            <li class="list-group-item" ng-repeat="planet in planetData.planets" style="{{pnlColor}}">
+                <div class="card border-dark" style="{{pnlColor}}">
+                    <div class="row no-gutters" style="{{pnlColor}}">
+                        <div class="align-self-center" style="{{pnlColor}}">
                             <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
-                        <div class="col">
-                            <div class="card-block p-1">
+                        <div class="col" style="{{pnlColor}}">
+                            <div class="card-block p-1" style="{{pnlColor}}">
                                 <h6 class="card-title">{{planet[0].planet_name}}</h6>
                                 <p class="card-text small">
                                     Difficulty Level: {{planet[0].difficulty_level}}
@@ -29,20 +29,20 @@
   </div>
   
   <!-- List of intermediate planets -->
-  <div class="col-sm-4" ng-controller="intermediatePlanetsPicker" ng-controller="nightControl">
-    <div class="card border-dark w-45">
+  <div class="col-sm-4" ng-controller="intermediatePlanetsPicker">
+    <div class="card border-dark w-45" style="{{hColor}}">
         <div class="card-header">
             <b>Intermediate Planets</b>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="planet in planetData.planets">
-                <div class="card border-dark">
-                    <div class="row no-gutters">
-                        <div class="align-self-center">
+        <ul class="list-group list-group-flush" style="{{pnlColor}}">
+            <li class="list-group-item" ng-repeat="planet in planetData.planets" style="{{pnlColor}}">
+                <div class="card border-dark" style="{{pnlColor}}">
+                    <div class="row no-gutters" style="{{pnlColor}}">
+                        <div class="align-self-center" style="{{pnlColor}}">
                             <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
-                        <div class="col">
-                            <div class="card-block p-1">
+                        <div class="col" style="{{pnlColor}}">
+                            <div class="card-block p-1" style="{{pnlColor}}">
                                 <h6 class="card-title">{{planet[0].planet_name}}</h6>
                                 <p class="card-text small">
                                     Difficulty Level: {{planet[0].difficulty_level}}
@@ -58,20 +58,20 @@
   </div>
   
   <!-- List of hard planets -->
-  <div class="col-sm-4" ng-controller="hardPlanetsPicker" ng-controller="nightControl">
-    <div class="card border-dark w-45">
+  <div class="col-sm-4" ng-controller="hardPlanetsPicker">
+    <div class="card border-dark w-45" style="{{hColor}}">
         <div class="card-header">
             <b>Hard Planets</b>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="planet in planetData.planets">
-                <div class="card border-dark">
-                    <div class="row no-gutters">
-                        <div class="align-self-center">
+        <ul class="list-group list-group-flush" style="{{pnlColor}}">
+            <li class="list-group-item" ng-repeat="planet in planetData.planets" style="{{pnlColor}}">
+                <div class="card border-dark" style="{{pnlColor}}">
+                    <div class="row no-gutters" style="{{pnlColor}}">
+                        <div class="align-self-center" style="{{pnlColor}}">
                             <img src="img/planet/{{planet[0].planet_image}}" style="max-height: 90px; max-width: 90px;">
                         </div>
-                        <div class="col">
-                            <div class="card-block p-1">
+                        <div class="col" style="{{pnlColor}}">
+                            <div class="card-block p-1" style="{{pnlColor}}">
                                 <h6 class="card-title">{{planet[0].planet_name}}</h6>
                                 <p class="card-text small">
                                     Difficulty Level: {{planet[0].difficulty_level}}

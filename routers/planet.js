@@ -29,7 +29,7 @@ router.get('/planet/fetch_all', function(req,res) {
                             if(err_param) throw err_param;
                             //console.error('Parameters: ' + JSON.stringify(parameters));
                             result.push(parameters);
-                            if(result.length == ids.length) {
+                            if(result.length === ids.length) {
                                 //console.error('Server response: ' + result.toString());
                                 res.send(result);
                             }
@@ -65,7 +65,7 @@ router.get('/planet/fetch_easy_planets', function(req,res) {
                             if(err_param) throw err_param;
                             //console.error('Parameters: ' + JSON.stringify(parameters));
                             result.push(parameters);
-                            if(result.length == ids.length) {
+                            if(result.length === ids.length) {
                                 //console.error('Server response: ' + result.toString());
                                 res.send(result);
                             }
@@ -101,7 +101,7 @@ router.get('/planet/fetch_intermediate_planets', function(req,res) {
                             if(err_param) throw err_param;
                             //console.error('Parameters: ' + JSON.stringify(parameters));
                             result.push(parameters);
-                            if(result.length == ids.length) {
+                            if(result.length === ids.length) {
                                 //console.error('Server response: ' + result.toString());
                                 res.send(result);
                             }
@@ -137,7 +137,7 @@ router.get('/planet/fetch_hard_planets', function(req,res) {
                             if(err_param) throw err_param;
                             //console.error('Parameters: ' + JSON.stringify(parameters));
                             result.push(parameters);
-                            if(result.length == ids.length) {
+                            if(result.length === ids.length) {
                                 //console.error('Server response: ' + result.toString());
                                 res.send(result);
                             }
@@ -168,7 +168,7 @@ router.get('/planet/goToPlanet', function(req, res) {
                     return;
                 }
                 
-                if(result) {
+                if(result === true) {
                     res.redirect('/home');
                 }
                 else {

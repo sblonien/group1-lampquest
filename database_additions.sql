@@ -1,6 +1,5 @@
 --This file contains the sql for the database changes.
 
-
 --Item, planet, and robot additions:
 
 --item
@@ -31,13 +30,13 @@ INSERT INTO diffusor VALUES (14, 13, 8, 200, 1), (15, 13, 20, 300, 1), (16, 17, 
 INSERT INTO produce_diffusor VALUES (14, 3, 4), (14, 16, 1), (15, 11, 1), (15, 15, 4), (16, 3, 1), (16, 13, 2), (17, 7, 2), (17, 19, 4), (18, 13, 1), (18, 19, 2);
 
 --Other changes:
-
+--planet_user
 --Add fields for time_started and time_completed
 ALTER TABLE planet_user
 ADD time_started TIMESTAMP DEFAULT CURRENT_TIMESTAMP, time_finished TIMESTAMP DEFAULT NULL;
 
 --Create friends table
-CREATE TABLE friends (user_id_1 INT, user_id_2 INT);
+CREATE TABLE friends (user_id_1 INT NOT NULL, user_id_2 INT NOT NULL);
 
 --Add the isOnline column for the friends list
 ALTER TABLE user

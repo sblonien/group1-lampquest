@@ -110,6 +110,7 @@ class User {
                         // Assign a planet of difficulty 1 to the new user
                         let planet_user = new PlanetUser(result.insertId);
                         
+                        console.log("Calling addNewPlanet in addUser");
                         planet_user.addNewPlanet(1, function(err_planet, result_planet) {
                             if (err_planet) {
                                 console.log('Error encountered on ' + Date());
@@ -213,7 +214,7 @@ class User {
             }
             
             console.error('Setting ' + self.username + ' to be online: ' + isOnline);
-            if(self.username && self.password)
+            if(self.username != undefined && self.password != undefined)
                 con.query(sql, [isOnline, self.username, md5(self.password)], function (err, result) {
                     if (err) {
                         console.log('Error encountered on ' + Date());
@@ -358,13 +359,13 @@ class User {
         (SELECT user_id FROM user WHERE username = ? LIMIT 1)); ";
         // Delete everything in item_robot for this user
         let sql2 = "DELETE FROM item_robot WHERE robot_id IN \
-        (SELECT robot_id FROM robot WHERE planet_user_id = \
+        (SELECT robot_id FROM robot WHERE planet_user_id IN \
         (SELECT planet_user_id FROM planet_user WHERE user_id = \
-        (SELECT user_id FROM user WHERE username = ? LIMIT 1) LIMIT 1)); "
+        (SELECT user_id FROM user WHERE username = ? LIMIT 1))); "
         // Delete everything in robot for this user
-        let sql3 = "DELETE FROM robot WHERE planet_user_id = \
+        let sql3 = "DELETE FROM robot WHERE planet_user_id IN \
         (SELECT planet_user_id FROM planet_user WHERE user_id = \
-        (SELECT user_id FROM user WHERE username = ? LIMIT 1) LIMIT 1); ";
+        (SELECT user_id FROM user WHERE username = ? LIMIT 1)); ";
         // Delete everything in planet_user for this user
         let sql4 = "DELETE FROM planet_user WHERE user_id = \
         (SELECT user_id FROM user WHERE username = ?); ";
